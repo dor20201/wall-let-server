@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 
-@Controller()
+@Controller('gamenification')
 
 export class GamenificationController {
-  
+
 }
