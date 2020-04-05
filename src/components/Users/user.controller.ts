@@ -6,12 +6,19 @@ export class UserController {
   constructor(private userService: UserService) {
   }
 
+
+  @Get()
+  getHello(): string {
+    return "swisa";
+  }
+
+
   @Post()
   addUser(@Body('FirstName') FirstName: string,
           @Body('LastName') LastName: string,
           @Body('Email') Email: string,
           @Body('PhoneNumber') PhoneNumber: number,
-          @Body('DateOfBirth') DateOfBirth: Date,
+          @Body('DateOfBirth') DateOfBirth: string,
           @Body('MaritalStatus') MaritalStatus: string,
           @Body('AddictedStatus') AddictedStatus: string,
           @Body('MyTarget') MyTarget: string,
@@ -21,7 +28,9 @@ export class UserController {
           @Body('MyFixedExpenses') MyFixedExpenses: [],
           @Body('MyFixedIncomes') MyFixedIncomes: [],
   ) {
-    this.userService.insertUser(FirstName, LastName, Email, PhoneNumber, DateOfBirth, MaritalStatus, AddictedStatus, WalletMember, FriendMember, MyWalletMembers, MyFixedExpenses, MyFixedIncomes, 5).then();
+    console.log("I made it to the Controller");
+
+    this.userService.insertUser(FirstName, LastName, Email, PhoneNumber, DateOfBirth, MaritalStatus, AddictedStatus, WalletMember, FriendMember, MyWalletMembers, MyFixedExpenses, MyFixedIncomes, 5);
   };
 
 

@@ -6,16 +6,13 @@ import { Model } from 'mongoose';
 @Injectable()
 export class UserService {
 
-  constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
-  ) {
-  }
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) { }
 
    async insertUser(firstName: string,
              lastName: string,
              email: string,
              phoneNumber: number,
-             dateOfBirth: Date,
+             dateOfBirth: string,
              maritalStatus: string,
              addictedStatus: string,
              walletMember: boolean,
@@ -24,6 +21,7 @@ export class UserService {
              myFixedExpenses: [],
              myFixedIncomes: [],
              passes: number) {
+     console.log("I made it to the service" + passes);
 
 const newUser = new this.userModel({
   firstName,
