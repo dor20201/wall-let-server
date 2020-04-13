@@ -4,32 +4,36 @@ export const UserSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true },
-  PhoneNumber: { type: Number, required: true },
-  DateOfBirth: { type: Date, required: true },
-  MaritalStatus: { type: String, required: true },
-  AddictedStatus: { type: String, required: true },
-  WalletMember: { type: Boolean, required: true },
-  FriendMember: { type: Boolean, required: true },
-  MyWalletMembers: { type: [], required: true },
-  MyFixedExpenses: { type: [], required: true },
-  MyFixedIncomes: { type: [], required: true },
-  Passes: { type: Number, required: true },
+  password: { type: String, required: true },
+  phoneNumber: { type: Number, required: true },
+   dateOfBirth: { type: String, required: true },
+   maritalStatus: { type: String, required: true },
+  addictedStatus: { type: String, required: true },
+  myTarget: { type: Number, required: true },
+  walletMember: { type: Boolean, required: true },
+  friendMember: { type: Boolean, required: true },
+  myWalletMembers: { type: [String], required: true },
+  myFixedExpenses: { type: [{String:Number}], required: true },
+  myFixedIncomes: { type: [{String:Number}], required: true },
+  passes: { type: Number, required: true }
 
 });
 
-export interface User {
+export interface User extends mongoose.Document{
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  Password: string;
   PhoneNumber: number;
-  DateOfBirth: Date;
+  DateOfBirth: string;
   MaritalStatus: string;
   AddictedStatus: string;
+  MyTarget:number;
   WalletMember: boolean;
   FriendMember: boolean;
-  MyWalletMembers: [];
-  MyFixedExpenses: [];
-  MyFixedIncomes: [];
+  MyWalletMembers: string[];
+  MyFixedExpenses: string[];
+  MyFixedIncomes: string[];
   Passes: number;
 }
