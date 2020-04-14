@@ -18,9 +18,9 @@ export class UserController {
     return this.userService.getUserById(userId);
   }
 
-  @Get(':Email&:Password')
-  getUserByPassword(@Param('Email') userEmail: string,
-                    @Param('Password') userPassword: string) {
+  @Get()
+  getUserByPassword(@Body('Email') userEmail: string,
+                    @Body('Password') userPassword: string) {
     return this.userService.getUserByPassword(userEmail, userPassword);
   }
 
@@ -47,7 +47,7 @@ export class UserController {
   };
 
   @Patch(':id')
-  updateUserFriends(
+  updateUser(
     @Param('id') userId: string,
     @Body('FirstName') FirstName: string,
     @Body('LastName') LastName: string,
