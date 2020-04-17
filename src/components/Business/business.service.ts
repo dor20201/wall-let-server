@@ -1,57 +1,65 @@
-import {Injectable, NotFoundException} from "@nestjs/common";
-import {Product} from "./business.model";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Business } from './business.model';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from '../Users/user.model';
 
 @Injectable()
 export class BusinessService {
-  private products: Product[] = [];
 
-
-  findBusiness(prodId: string):[Product ,number] {
-    const prodIndex = this.products.findIndex((prod) => prod.id == prodId);
-    const product = this.products[prodIndex];
-    if (!product) {
-      throw new NotFoundException();
-    }
-    return [product, prodIndex];
+  constructor(@InjectModel('Business') private readonly businessModel: Model<Business>) {
   }
-  insertBusiness(businessName: string, category: string, price: number) {
-    const newProduct = new Product(Math.random().toString(), businessName, category, price);
-    this.products.push(newProduct);
-    return newProduct.id;
+
+  findBusiness(prodId: string) {
+
+  }
+
+  async insertBusiness(name: string, category: string, financial: [{ string: number }]) {
+    const newBusiness = new this.businessModel({
+      name,
+      category,
+      financial,
+    });
+    const result = await newBusiness.save();
+    return result._id;
+
   }
 
   getBusiness() {
-    return [...this.products]
+
   }
 
-  getBusinessById(prodId: string) {
-    const prod = this.findBusiness(prodId)[0];
-    if (!prod) {
-      throw new NotFoundException('Product was not found.');
+  async getBusinessById(businessId: string): Promise<Business> {
+    let business;
+    try {
+      business = await this.businessModel.findById(businessId).exec();
+    } catch (e) {
+      throw new NotFoundException('could not find user');
     }
-    return {...prod};
+    if (!business) {
+      throw new NotFoundException('could not find user');
+    }
+    return business;
   }
 
-  updateBusiness(prodId: string, prodTitle: string, prodDes: string, prodPrice: number) {
-    const product = this.findBusiness(prodId)[0];
-    const index = this.findBusiness(prodId)[1];
-
-    const updateProduct = {...product};
-    if(prodTitle){
-      updateProduct.title = prodTitle;
+  async updateBusiness(businessId: string, name: string, category: string, financial: [{ string: number }]) {
+    const updateBusiness = await this.getBusinessById(businessId);
+    if (name) {
+      updateBusiness.name = name;
     }
-    if(prodDes){
-      updateProduct.descriptaion = prodDes;
+    if (category) {
+      updateBusiness.category = category;
     }
-    if (prodPrice){
-      updateProduct.price=prodPrice;
+    if (financial) {
+      updateBusiness.financial = financial;
     }
 
-    this.products[index] = updateProduct;
+    const result = await updateBusiness.save();
+    return null;
   }
 
-  deleteBusinessById(id: any) {
-    const index =this.findBusiness(id)[1];
-    this.products.splice(index,1);
+  async deleteBusinessById(businessId: any) {
+    await this.businessModel.deleteOne(businessId);
+    return null;
   }
 }

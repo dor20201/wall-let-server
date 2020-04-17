@@ -7,10 +7,12 @@ export class BusinessController {
   }
 
   @Post()
-  addBusiness(@Body('businessName') businessName: string,
-              @Body('category') category: string) {
-    this.businessService.insertBusiness(businessName, category, 62);
+  addBusiness(@Body('name') businessName: string,
+              @Body('category') category: string,
+              @Body('financial') financial: [{string:number}]) {
+    this.businessService.insertBusiness(businessName, category, financial).then();
   }
+
 
 
   @Get()
@@ -23,16 +25,16 @@ export class BusinessController {
     return this.businessService.getBusinessById(businessId);
   }
 
+
+
   @Patch(':id')
   updateBusiness(
     @Param('id') prodId: string,
-    @Body('title') prodTitle: string,
-    @Body('description') prodDescription: string,
-    @Body('price') prodPrice: number): any {
-    this.businessService.updateBusiness(prodId, prodTitle, prodDescription, prodPrice);
-
-    return;
-    null;
+    @Body('name') businessName: string,
+    @Body('category') category: string,
+    @Body('financial') financial: [{string:number}]): any {
+    this.businessService.updateBusiness(prodId, businessName, category, financial).then();
+    return null;
   }
 
   @Delete(':id')

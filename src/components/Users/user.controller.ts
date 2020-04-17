@@ -6,19 +6,12 @@ export class UserController {
   constructor(private userService: UserService) {
   }
 
-
-  @Get()
-  getHello(): string {
-    console.log('Swisaaaaa');
-    return 'swisa';
-  }
-
   @Get(':id')
   getProduct(@Param('id') userId: string) {
     return this.userService.getUserById(userId);
   }
 
-  @Get()
+  @Post('email')
   getUserByPassword(@Body('Email') userEmail: string,
                     @Body('Password') userPassword: string) {
     return this.userService.getUserByPassword(userEmail, userPassword);
@@ -30,6 +23,7 @@ export class UserController {
           @Body('LastName') LastName: string,
           @Body('Email') Email: string,
           @Body('Password') Password: string,
+          @Body('AnswerPassword') AnswerPassword: string,
           @Body('PhoneNumber') PhoneNumber: number,
           @Body('DateOfBirth') DateOfBirth: string,
           @Body('MaritalStatus') MaritalStatus: string,
@@ -38,13 +32,22 @@ export class UserController {
           @Body('WalletMember') WalletMember: boolean,
           @Body('FriendMember') FriendMember: boolean,
           @Body('MyWalletMembers') MyWalletMembers: string[],
-          @Body('MyFixedExpenses') MyFixedExpenses: string[],
-          @Body('MyFixedIncomes') MyFixedIncomes: string[],
+          @Body('MyFixedExpenses') MyFixedExpenses: [{ string: number }],
+          @Body('MyFixedIncomes') MyFixedIncomes: [{ string: number }],
   ): Promise<any> {
-    const user = this.userService.insertUser(FirstName, LastName, Email, Password, PhoneNumber, DateOfBirth, MaritalStatus, AddictedStatus, MyTarget, WalletMember, FriendMember, MyWalletMembers, MyFixedExpenses, MyFixedIncomes, 5).then();
+    const user = this.userService.insertUser(FirstName, LastName, Email, Password, AnswerPassword ,PhoneNumber, DateOfBirth, MaritalStatus, AddictedStatus, MyTarget, WalletMember, FriendMember, MyWalletMembers, MyFixedExpenses, MyFixedIncomes, 5).then();
 
     return user;
   };
+
+  @Post(':id')
+  async verificationPasswordAnswer(@Param('id') userId: string,
+                              @Body('answer') answer: string): Promise<boolean> {
+    const isItTrue = this.userService.isPasswordAnswerCorrect(userId, answer).then();
+    return isItTrue;
+
+  }
+
 
   @Patch(':id')
   updateUser(
@@ -53,6 +56,7 @@ export class UserController {
     @Body('LastName') LastName: string,
     @Body('Email') Email: string,
     @Body('Password') Password: string,
+    @Body('AnswerPassword') AnswerPassword: string,
     @Body('PhoneNumber') PhoneNumber: number,
     @Body('DateOfBirth') DateOfBirth: string,
     @Body('MaritalStatus') MaritalStatus: string,
@@ -61,10 +65,11 @@ export class UserController {
     @Body('WalletMember') WalletMember: boolean,
     @Body('FriendMember') FriendMember: boolean,
     @Body('MyWalletMembers') MyWalletMembers: string[],
-    @Body('MyFixedExpenses') MyFixedExpenses: string[],
-    @Body('MyFixedIncomes') MyFixedIncomes: string[],
+    @Body('MyFixedExpenses') MyFixedExpenses: [{ string: number }],
+    @Body('MyFixedIncomes') MyFixedIncomes: [{ string: number }],
   ): any {
-    this.userService.updateUser(userId, FirstName, LastName, Password, PhoneNumber, DateOfBirth, MaritalStatus, AddictedStatus, MyTarget, WalletMember, FriendMember, MyWalletMembers, MyFixedExpenses, MyFixedIncomes).then();
+    console.log(PhoneNumber + '   ' + userId);
+    this.userService.updateUser(userId, FirstName, LastName, Password,AnswerPassword, PhoneNumber, DateOfBirth, MaritalStatus, AddictedStatus, MyTarget, WalletMember, FriendMember, MyWalletMembers, MyFixedExpenses, MyFixedIncomes).then();
     return null;
   }
 }

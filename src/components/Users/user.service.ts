@@ -13,6 +13,7 @@ export class UserService {
                    lastName: string,
                    email: string,
                    password: string,
+                   answerPassword: string,
                    phoneNumber: number,
                    dateOfBirth: string,
                    maritalStatus: string,
@@ -21,8 +22,8 @@ export class UserService {
                    walletMember: boolean,
                    friendMember: boolean,
                    myWalletMembers: string[],
-                   myFixedExpenses: string[],
-                   myFixedIncomes: string[],
+                   myFixedExpenses: [{ string: number }],
+                   myFixedIncomes: [{ string: number }],
                    passes: number,
   ) {
     const newUser = new this.userModel({
@@ -30,6 +31,7 @@ export class UserService {
       lastName,
       email,
       password,
+      answerPassword,
       phoneNumber,
       dateOfBirth,
       maritalStatus,
@@ -64,19 +66,35 @@ export class UserService {
     return users;
   }
 
-
   async getUserByPassword(userEmail: string, userPassword: string) {
-    const user = await this.userModel.findOne({ Email: userEmail, Password: userPassword }).exec();
+    console.log(userEmail + '   ' + userPassword);
+    const user = await this.userModel.findOne({ 'email': userEmail, 'password': userPassword }).exec();
+    console.log(user);
+
     if (!user) {
       throw new NotFoundException('The Email or Password are incorrect');
     }
     return user;
   }
 
+  async isPasswordAnswerCorrect(userId: string, answer: string) {
+    let user;
+    try {
+      user = await this.getUserById(userId);
+      if (user.AnswerPassword == answer) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      throw new NotFoundException('could not find user');
+    }
+  }
+
   async updateUser(userId: string,
                    FirstName: string,
                    LastName: string,
                    Password: string,
+                   AnswerPassword: string,
                    PhoneNumber: number,
                    DateOfBirth: string,
                    MaritalStatus: string,
@@ -85,8 +103,8 @@ export class UserService {
                    WalletMember: boolean,
                    FriendMember: boolean,
                    MyWalletMembers: string[],
-                   MyFixedExpenses: string[],
-                   MyFixedIncomes: string[]) {
+                   MyFixedExpenses: [{ string: number }],
+                   MyFixedIncomes: [{ string: number }]) {
     const updateUser = await this.getUserById(userId);
     if (FirstName) {
       updateUser.FirstName = FirstName;
@@ -97,7 +115,11 @@ export class UserService {
     if (Password) {
       updateUser.Password = Password;
     }
+    if (AnswerPassword) {
+      updateUser.AnswerPassword = AnswerPassword;
+    }
     if (PhoneNumber) {
+      console.log(PhoneNumber);
       updateUser.PhoneNumber = PhoneNumber;
     }
     if (DateOfBirth) {
@@ -121,9 +143,11 @@ export class UserService {
     if (MyWalletMembers) {
       updateUser.MyWalletMembers = MyWalletMembers;
     }
-
+    const result = await updateUser.save();
     return null;
   }
+
+
 }
 
 
