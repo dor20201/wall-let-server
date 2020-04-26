@@ -7,7 +7,7 @@ import { User } from '../Users/user.model';
 @Injectable()
 export class BusinessService {
 
-  constructor(@InjectModel('Business') private readonly businessModel: Model<Business>) {
+  constructor(@InjectModel('Business') private readonly BusinessModel: Model<Business>) {
   }
 
   findBusiness(prodId: string) {
@@ -15,7 +15,7 @@ export class BusinessService {
   }
 
   async insertBusiness(name: string, category: string, financial: [{ string: number }]) {
-    const newBusiness = new this.businessModel({
+    const newBusiness = new this.BusinessModel({
       name,
       category,
       financial,
@@ -32,7 +32,7 @@ export class BusinessService {
   async getBusinessById(businessId: string): Promise<Business> {
     let business;
     try {
-      business = await this.businessModel.findById(businessId).exec();
+      business = await this.BusinessModel.findById(businessId).exec();
     } catch (e) {
       throw new NotFoundException('could not find user');
     }
@@ -59,7 +59,7 @@ export class BusinessService {
   }
 
   async deleteBusinessById(businessId: any) {
-    await this.businessModel.deleteOne(businessId);
+    await this.BusinessModel.deleteOne(businessId);
     return null;
   }
 }

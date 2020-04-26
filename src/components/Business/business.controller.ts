@@ -13,8 +13,6 @@ export class BusinessController {
     this.businessService.insertBusiness(businessName, category, financial).then();
   }
 
-
-
   @Get()
   getAllBusiness() {
     return this.businessService.getBusiness();
@@ -24,8 +22,6 @@ export class BusinessController {
   getBusiness(@Param('id')businessId: string) {
     return this.businessService.getBusinessById(businessId);
   }
-
-
 
   @Patch(':id')
   updateBusiness(
@@ -39,7 +35,7 @@ export class BusinessController {
 
   @Delete(':id')
   deleteBusiness(@Param('id')prodId: string) {
-    this.businessService.deleteBusinessById(prodId);
+    this.businessService.deleteBusinessById(prodId).then();
     return null;
   }
 }

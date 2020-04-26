@@ -21,20 +21,20 @@ import * as mongoose from 'mongoose';
 
 export interface User extends mongoose.Document{
   id: string;
-  FirstName: string;
-  LastName: string;
-  Email: string;
-  Password: string;
-  AnswerPassword: string;
-  PhoneNumber: number;
-  DateOfBirth: string;
-  MaritalStatus: string;
-  AddictedStatus: string;
-  MyTarget:number;
-  WalletMember: boolean;
-  FriendMember: boolean;
-  MyWalletMembers: string[];
-  MyFixedExpenses: [{string:number}];
-  MyFixedIncomes: [{string:number}];
-  Passes: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  answerPassword: string;
+  phoneNumber: number;
+  dateOfBirth: string;
+  maritalStatus: string;
+  addictedStatus: string;
+  myTarget:number;
+  walletMember: boolean;
+  friendMember: boolean;
+  myWalletMembers: string[];
+  myFixedExpenses: [{string:number}];
+  myFixedIncomes: [{string:number}];
+  passes: number;
 }
