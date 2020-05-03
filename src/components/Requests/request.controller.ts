@@ -7,10 +7,14 @@ export class RequestController {
   constructor(private _requestModel: RequestService) {
   }
 
-
+@Get('Email')
+async getRequestForFriend(@Param('Email') Email:string){
+  return await this._requestModel.getFriendRequests(Email);
+}
 
   @Patch()
-  async createRequest(requestDto:RequestDto): Promise<string> {
+  async createRequest(@Body('request') requestDto:RequestDto): Promise<string> {
     return this._requestModel.createRequest(requestDto);
   }
+  get
 }

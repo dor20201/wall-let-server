@@ -7,7 +7,7 @@ export const NotificationSchema = new mongoose.Schema({
 
 });
 
-export interface Request extends mongoose.Document {
+export interface Notification extends mongoose.Document {
   id: string;
   Email: string;
   Sum: number;

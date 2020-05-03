@@ -1,13 +1,13 @@
 export class RequestDto {
   id: string;
-  Email: string;
+  email: string;
   category:string;
   cost:number;
   description:string;
   necessity:number;
   additionalDescription:string;
   pic: string;
-  friendsConfirmation:[string];
+  friendsConfirmation:[{string,boolean}];
   botConfirmation:boolean;
   confirmationStatus:boolean;
 }
