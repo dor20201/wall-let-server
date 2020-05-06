@@ -33,7 +33,7 @@ export interface User extends mongoose.Document {
   myTarget: number;
   walletMember: boolean;
   friendMember: boolean;
-  myWalletMembers: string[];
+  myWalletMembers: string[]; // array of emails
   myFixedExpenses: [{ string, number }];
   myFixedIncomes: [{ string, number }];
   passes: number;

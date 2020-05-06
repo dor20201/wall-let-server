@@ -9,5 +9,5 @@ export class RequestDto {
   pic: string;
   friendsConfirmation:[{string,boolean}];
   botConfirmation:boolean;
-  confirmationStatus:boolean;
+  confirmationStatus:string; //accept denied open
 }

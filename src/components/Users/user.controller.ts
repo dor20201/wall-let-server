@@ -9,13 +9,13 @@ export class UserController {
   }
 
   @Get(':id')
-  getProduct(@Param('id') userId: string) {
+  getUser(@Param('id') userId: string) {
     return this._userService.getUserById(userId);
   }
 
-  @Post('email')
-  getUserByPassword(@Body('Email') userEmail: string,
-                    @Body('Password') userPassword: string) {
+  @Post('signIn')
+  signIn(@Body('Email') userEmail: string,
+         @Body('Password') userPassword: string) {
     return this._userService.getUserByPassword(userEmail, userPassword);
   }
 
