@@ -21,6 +21,7 @@ export class UserController {
   }
 
 //checked
+  // need to fix incomes and Expenses
   @Post()
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
     const user = await this._userService.insertUser(userDto);
