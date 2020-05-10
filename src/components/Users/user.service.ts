@@ -11,7 +11,7 @@ export class UserService {
   constructor(@InjectModel('User') private readonly _userModel: Model<User>) {
   }
 
-  async insertUser(userDto:UserDto) {
+  async insertUser(userDto: UserDto) {
     const newUser = new this._userModel(userDto);
     const result = await newUser.save();
     return result._id;
@@ -48,7 +48,7 @@ export class UserService {
     let user;
     try {
       user = await this.getUserById(userId);
-      if (user.AnswerPassword == answer) {
+      if (user.answerPassword == answer) {
         return true;
       }
       return false;
@@ -57,8 +57,7 @@ export class UserService {
     }
   }
 
-  async updateUser(userDto:UserDto) {
-  //  const updateUser = await this.getUserById(userId).then();
+  async updateUser(userDto: UserDto) {
     const updateUser = await this._userModel.findById(userDto.id).exec();
 
     if (userDto.firstName) {
@@ -89,7 +88,7 @@ export class UserService {
       updateUser.myTarget = userDto.myTarget;
     }
     if (userDto.myFixedIncomes) {
-      updateUser.myFixedIncomes =userDto.myFixedIncomes;
+      updateUser.myFixedIncomes = userDto.myFixedIncomes;
     }
     if (userDto.myFixedExpenses) {
       updateUser.myFixedExpenses = userDto.myFixedExpenses;
@@ -98,7 +97,7 @@ export class UserService {
       updateUser.myWalletMembers = userDto.myWalletMembers;
     }
     await updateUser.save();
-    return 'Done'
+    return 'Done';
   }
 
 

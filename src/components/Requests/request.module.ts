@@ -5,10 +5,10 @@ import { RequestController } from './request.controller';
 import { RequestService } from './request.service';
 import {RequestSchema} from './request.model';
 import { NotificationModule } from '../Notification/notification.module';
-import { UserService } from '../Users/user.service';
+import { UserModule } from '../Users/user.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name:'Request',schema: RequestSchema}]), NotificationModule, UserService],
+  imports: [MongooseModule.forFeature([{name:'Request',schema: RequestSchema}]), NotificationModule, UserModule],
   controllers: [RequestController],
   providers: [RequestService]
 })
