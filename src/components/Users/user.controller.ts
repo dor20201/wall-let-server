@@ -13,19 +13,22 @@ export class UserController {
     return this._userService.getUserById(userId);
   }
 
+  //checked
   @Post('signIn')
-  signIn(@Body('Email') userEmail: string,
-         @Body('Password') userPassword: string) {
+  signIn(@Body('email') userEmail: string,
+         @Body('password') userPassword: string) {
     return this._userService.getUserByPassword(userEmail, userPassword);
   }
 
-
+//checked
+  // need to fix incomes and Expenses
   @Post()
-  async addUser(userDto: UserDto): Promise<User> {
+  async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
     const user = await this._userService.insertUser(userDto);
     return user;
   };
 
+  //checked
   @Post(':id')
   async verificationPasswordAnswer(@Param('id') userId: string,
                                    @Body('answer') answer: string): Promise<boolean> {
@@ -33,8 +36,8 @@ export class UserController {
     return isItTrue;
   }
 
-
-  @Patch(':id')
+//checked
+  @Patch()
   async updateUser(@Body() userDto: UserDto): Promise<string> {
     return await this._userService.updateUser(userDto);
   }

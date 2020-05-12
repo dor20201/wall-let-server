@@ -9,7 +9,7 @@ export const UserSchema = new mongoose.Schema({
   phoneNumber: { type: Number, required: true },
   dateOfBirth: { type: String, required: true },
   maritalStatus: { type: String, required: true },
-  addictedStatus: { type: String, required: true },
+  addictedStatus: { type: Number, required: true },
   myTarget: { type: Number, required: true },
   walletMember: { type: Boolean, required: true },
   friendMember: { type: Boolean, required: true },
@@ -29,7 +29,7 @@ export interface User extends mongoose.Document {
   phoneNumber: number;
   dateOfBirth: string;
   maritalStatus: string;
-  addictedStatus: string;
+  addictedStatus: number;
   myTarget: number;
   walletMember: boolean;
   friendMember: boolean;
