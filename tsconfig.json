@@ -6,8 +6,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es2017",
-    "sourceMap": true, 
-    "outDir": "./app/dist",
+    "sourceMap": true,
+    "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true
   },
