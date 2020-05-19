@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.model';
 import { Model } from 'mongoose';
-import { UserModule } from './user.module';
 import { UserDto } from './dto/user.dto';
 
 @Injectable()
@@ -36,7 +35,7 @@ export class UserService {
     return users;
   }
 
-  async getUserByPassword(userEmail: string, userPassword: string) {
+  async getUserByPassword(userEmail: string, userPassword: string):Promise<User> {
     const user = await this._userModel.findOne({ 'email': userEmail, 'password': userPassword }).exec();
     if (!user) {
       throw new NotFoundException('The Email or Password are incorrect');
@@ -100,6 +99,10 @@ export class UserService {
     return 'Done';
   }
 
+
+  async getUsersByEmails(usersId:string[]):Promise<any>{
+    return await this._userModel.find({'email':{$in:usersId}}).exec();
+  }
 
 }
 
