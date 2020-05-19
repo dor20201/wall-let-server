@@ -101,7 +101,11 @@ export class UserService {
 
 
   async getUsersByEmails(usersId:string[]):Promise<any>{
-    return await this._userModel.find({'email':{$in:usersId}}).exec();
+    try {
+      return await this._userModel.find({ 'email': { $in: usersId } }).exec();
+    }catch (e) {
+      throw new NotFoundException('The Users were not found');
+    }
   }
 
 }

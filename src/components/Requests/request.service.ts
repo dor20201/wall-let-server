@@ -8,7 +8,6 @@ import {UserService} from '../Users/user.service';
 
 @Injectable()
 export class RequestService {
-
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
               private _notificationService: NotificationService,private _userService:UserService) {
   }
