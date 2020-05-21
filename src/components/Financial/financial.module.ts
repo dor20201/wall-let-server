@@ -9,6 +9,6 @@ import { CreditCardSchema, TransactionSchema } from './financial.model';
   controllers: [FinancialController],
   providers: [FinancialService],
 })
-export class Financial {
+export class FinancialModule {
 
 }

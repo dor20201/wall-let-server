@@ -9,13 +9,13 @@ export class FinancialService {
               @InjectModel('Transaction') private readonly TransactionModel: Model<Transaction>) {
   }
 
-  async insertCreditCard(walletMemberId: string, companyName: string, creditCardNumber: number, valid: Date, csv: string) {
+  async insertCreditCard(walletMemberId: string, companyName: string, creditCardNumber: number, valid: Date, cvc: string) {
     const newCreditCard = new this.CreditCardModel({
       walletMemberId,
       companyName,
       creditCardNumber,
       valid,
-      csv
+      cvc
     });
 
     const result = await newCreditCard.save();

@@ -13,7 +13,7 @@ export class FinancialController {
               @Body('companyName') companyName: string,
               @Body('cardNumber') cardNumber: number,
               @Body('valid') valid: Date,
-              @Body('csv') csv: string) {
+              @Body('cvc') cvc: string) {
     const constraints = {
       creditCardNumber: {
         presence: true,
@@ -41,12 +41,12 @@ export class FinancialController {
 
     // TODO: Check if the details are valid
     if(validate({creditCardNumber: cardNumber}, constraints) &&
-      (/^\d{3,4}$/).test(csv)) {
+      (/^\d{3,4}$/).test(cvc)) {
       this.financialService.insertCreditCard(userId,
         companyName,
         cardNumber,
         valid,
-        csv).then();
+        cvc).then();
       return "success"
     } else {
       return "Invalid credit card's details"

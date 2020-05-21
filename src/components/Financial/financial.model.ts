@@ -5,7 +5,7 @@ export const CreditCardSchema = new mongoose.Schema({
   companyName: { type: String, required: true },
   creditCardNumber:{ type: Number, required:true},
   valid:{ type: Date, required: true},
-  csv: {type: String, required: true}
+  cvc: {type: String, required: true}
 });
 
 export interface CreditCard extends mongoose.Document {
@@ -13,7 +13,7 @@ export interface CreditCard extends mongoose.Document {
   companyName: string;
   creditCardNumber: number;
   valid: Date;
-  csv: number;
+  cvc: number;
 }
 
 export const TransactionSchema = new mongoose.Schema({
