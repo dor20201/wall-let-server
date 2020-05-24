@@ -13,10 +13,15 @@ export class RequestService {
   }
 
   async createRequest(requestDto: RequestDto): Promise<string> {
+  try{
     const newRequest = new this._requestModel(requestDto);
     const result = await newRequest.save();
     // add Notification
-    return result._id;
+    return result._id;}
+    catch (e) {
+      throw new NotFoundException('could not create Request');
+
+    }
   }
 
 

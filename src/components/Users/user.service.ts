@@ -11,9 +11,13 @@ export class UserService {
   }
 
   async insertUser(userDto: UserDto) {
-    const newUser = new this._userModel(userDto);
-    const result = await newUser.save();
-    return result._id;
+    try {
+      const newUser = new this._userModel(userDto);
+      const result = await newUser.save();
+      return result._id;
+    } catch (e) {
+      throw new NotFoundException('The Users were not insert correctly ');
+    }
   }
 
   async getUserById(userId: string): Promise<User> {
@@ -35,7 +39,7 @@ export class UserService {
     return users;
   }
 
-  async getUserByPassword(userEmail: string, userPassword: string):Promise<User> {
+  async getUserByPassword(userEmail: string, userPassword: string): Promise<User> {
     const user = await this._userModel.findOne({ 'email': userEmail, 'password': userPassword }).exec();
     if (!user) {
       throw new NotFoundException('The Email or Password are incorrect');
@@ -56,54 +60,57 @@ export class UserService {
     }
   }
 
-  async updateUser(userDto: UserDto) {
-    const updateUser = await this._userModel.findById(userDto.id).exec();
+  async updateUser(userDto: UserDto): Promise<User> {
+    try {
+      const updateUser = await this._userModel.findById(userDto.id).exec();
 
-    if (userDto.firstName) {
-      updateUser.firstName = userDto.firstName;
+      if (userDto.firstName) {
+        updateUser.firstName = userDto.firstName;
+      }
+      if (userDto.lastName) {
+        updateUser.lastName = userDto.lastName;
+      }
+      if (userDto.password) {
+        updateUser.password = userDto.password;
+      }
+      if (userDto.answerPassword) {
+        updateUser.answerPassword = userDto.answerPassword;
+      }
+      if (userDto.phoneNumber) {
+        updateUser.phoneNumber = userDto.phoneNumber;
+      }
+      if (userDto.dateOfBirth) {
+        updateUser.dateOfBirth = userDto.dateOfBirth;
+      }
+      if (userDto.maritalStatus) {
+        updateUser.maritalStatus = userDto.maritalStatus;
+      }
+      if (userDto.addictedStatus) {
+        updateUser.addictedStatus = userDto.addictedStatus;
+      }
+      if (userDto.myTarget) {
+        updateUser.myTarget = userDto.myTarget;
+      }
+      if (userDto.myFixedIncomes) {
+        updateUser.myFixedIncomes = userDto.myFixedIncomes;
+      }
+      if (userDto.myFixedExpenses) {
+        updateUser.myFixedExpenses = userDto.myFixedExpenses;
+      }
+      if (userDto.myWalletMembers) {
+        updateUser.myWalletMembers = userDto.myWalletMembers;
+      }
+      await updateUser.save();
+      return updateUser;
+    } catch (e) {
+      throw new NotFoundException('The Users were not update');
     }
-    if (userDto.lastName) {
-      updateUser.lastName = userDto.lastName;
-    }
-    if (userDto.password) {
-      updateUser.password = userDto.password;
-    }
-    if (userDto.answerPassword) {
-      updateUser.answerPassword = userDto.answerPassword;
-    }
-    if (userDto.phoneNumber) {
-      updateUser.phoneNumber = userDto.phoneNumber;
-    }
-    if (userDto.dateOfBirth) {
-      updateUser.dateOfBirth = userDto.dateOfBirth;
-    }
-    if (userDto.maritalStatus) {
-      updateUser.maritalStatus = userDto.maritalStatus;
-    }
-    if (userDto.addictedStatus) {
-      updateUser.addictedStatus = userDto.addictedStatus;
-    }
-    if (userDto.myTarget) {
-      updateUser.myTarget = userDto.myTarget;
-    }
-    if (userDto.myFixedIncomes) {
-      updateUser.myFixedIncomes = userDto.myFixedIncomes;
-    }
-    if (userDto.myFixedExpenses) {
-      updateUser.myFixedExpenses = userDto.myFixedExpenses;
-    }
-    if (userDto.myWalletMembers) {
-      updateUser.myWalletMembers = userDto.myWalletMembers;
-    }
-    await updateUser.save();
-    return 'Done';
   }
 
-
-  async getUsersByEmails(usersId:string[]):Promise<any>{
+  async getUsersByEmails(usersId: string[]): Promise<any> {
     try {
       return await this._userModel.find({ 'email': { $in: usersId } }).exec();
-    }catch (e) {
+    } catch (e) {
       throw new NotFoundException('The Users were not found');
     }
   }
