@@ -114,7 +114,7 @@ export class UserService {
       throw new NotFoundException('The Users were not found');
     }
   }
-  
+
   }
 
 

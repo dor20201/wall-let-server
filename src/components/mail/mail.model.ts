@@ -1,6 +1,5 @@
 export class Mail {
-    mailA:string;
-    mailB:string;
+    sendTo:string;
     subject:string;
     content:string;
 
