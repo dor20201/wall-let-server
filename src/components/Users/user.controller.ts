@@ -42,7 +42,7 @@ export class UserController {
 
 //checked
   @Patch()
-  async updateUser(@Body() userDto: UserDto): Promise<string> {
+  async updateUser(@Body() userDto: UserDto): Promise<User> {
     return await this._userService.updateUser(userDto);
   }
 }

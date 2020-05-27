@@ -5,18 +5,19 @@ import { Model } from 'mongoose';
 import { RequestDto } from './dto/request.dto';
 import { NotificationService } from '../Notification/notification.service';
 import {UserService} from '../Users/user.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class RequestService {
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
-              private _notificationService: NotificationService,private _userService:UserService) {
+              private _notificationService: NotificationService,private _userService:UserService,private  _mailService:MailService) {
   }
 
   async createRequest(requestDto: RequestDto): Promise<string> {
   try{
     const newRequest = new this._requestModel(requestDto);
     const result = await newRequest.save();
-    // add Notification
+    this._mailService.sendMail({mailA:"dor20201@gmail.com",mailB:"Dor20201@gmail.com",subject:"create request",content:"swisa add request"})
     return result._id;}
     catch (e) {
       throw new NotFoundException('could not create Request');
