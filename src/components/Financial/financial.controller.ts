@@ -6,10 +6,5 @@ export class FinancialController {
   constructor(private financialService: FinancialService) {
   }
 
-  @Post()
-  addser() {
-
-  };
-
 
 }

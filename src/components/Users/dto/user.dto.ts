@@ -13,7 +13,7 @@ export class UserDto {
   walletMember: boolean;
   friendMember: boolean;
   myWalletMembers: string[];
-  myFixedExpenses: [{string,number}];
-  myFixedIncomes: [{string,number}];
+  myFixedExpenses: [{ name: string, expense: number }];
+  myFixedIncomes: [{ name: string, income: number }];
   passes: number;
 }

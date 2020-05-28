@@ -6,7 +6,7 @@ import {UserModule} from './components/Users/user.module';
 import  {BusinessModule} from './components/Business/business.module';
 import {RequestModule} from './components/Requests/request.module';
 import { NotificationService } from './components/Notification/notification.service';
-import {MailModule} from './components/mail/mail.module';
+import {MailModule} from './components/Mail/mail.module';
 
 
 @Module({

@@ -18,7 +18,7 @@ export class UserController {
     return this._userService.getUsersByEmails(emails);
   }
   //checked
-  @Post('signIn')
+  @Post('logIn')
   signIn(@Body('email') userEmail: string,
          @Body('password') userPassword: string) {
     return this._userService.getUserByPassword(userEmail, userPassword);
@@ -26,7 +26,7 @@ export class UserController {
 
 //checked
   // need to fix incomes and Expenses
-  @Post()
+  @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
     const user = await this._userService.insertUser(userDto);
     return user;

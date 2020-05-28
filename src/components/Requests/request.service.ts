@@ -5,8 +5,8 @@ import { Model } from 'mongoose';
 import { RequestDto } from './dto/request.dto';
 import { NotificationService } from '../Notification/notification.service';
 import { UserService } from '../Users/user.service';
-import { MailService } from '../mail/mail.service';
-import { Mail } from '../mail/mail.model';
+import { MailService } from '../Mail/mail.service';
+import { Mail } from '../Mail/mail.model';
 
 @Injectable()
 export class RequestService {
@@ -26,7 +26,6 @@ export class RequestService {
 
     }
   }
-
 
   getRequests(userType: string, confirmationStatus: string, Email: string): Promise<Request[]> {
 
@@ -101,6 +100,13 @@ export class RequestService {
       return 'Request '+ requestId + 'as been approved' ;
     }
     return 'User dont have passes';
+  }
+
+  async insertScore(requestId:string,score:number):Promise<string>{
+    const request = await this.getRequestById(requestId);
+    request.score = score;
+    await  request.save();
+    return "score insert correctly"
   }
 }
 

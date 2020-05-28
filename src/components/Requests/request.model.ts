@@ -10,7 +10,8 @@ export const RequestSchema = new mongoose.Schema({
   pic: { type: String, required: true },
   friendsConfirmation: { type: [{ email: String, confirm: Boolean }], required: true },
   botConfirmation: { type: Boolean, required: true },
-  confirmationStatus: { type: String, required: true } // open ,approved, inProcess,unApproved
+  confirmationStatus: { type: String, required: true }, // open ,approved, inProcess,unApproved
+  score:{type:Number,required:true}
 
 });
 
@@ -25,7 +26,8 @@ export interface Request extends mongoose.Document {
   pic: string;
   friendsConfirmation: [{string,boolean}];
   botConfirmation: boolean;
-  confirmationStatus: string;// open ,approved, inProcess
+  confirmationStatus: string;// open ,approved, inProcess;
+  score:number
 
 
 }

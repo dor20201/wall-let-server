@@ -21,7 +21,7 @@ export class MailService {
       },
     });
 
-    // send mail with defined transport object
+    // send Mail with defined transport object
     const info = await transporter.sendMail({
       from: '"Wallet-app" <dor20201@gmail.com>', // sender address
       to: mail.sendTo, // list of receivers

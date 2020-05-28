@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Req } from '@nestjs/common';
 import {MongooseModule} from '@nestjs/mongoose';
 
 import { RequestController } from './request.controller';
@@ -6,12 +6,13 @@ import { RequestService } from './request.service';
 import {RequestSchema} from './request.model';
 import { NotificationModule } from '../Notification/notification.module';
 import { UserModule } from '../Users/user.module';
-import { MailModule } from '../mail/mail.module';
+import { MailModule } from '../Mail/mail.module';
 
 @Module({
   imports: [MongooseModule.forFeature([{name:'Request',schema: RequestSchema}]), NotificationModule, UserModule,MailModule],
   controllers: [RequestController],
-  providers: [RequestService]
+  providers: [RequestService],
+  exports:[RequestService]
 })
 export class RequestModule {
 

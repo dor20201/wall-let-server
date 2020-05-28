@@ -20,7 +20,7 @@ export class UserService {
     }
   }
 
-  async getUserById(userId: string): Promise<User> {
+  async getUserById(userId: string) : Promise<User> {
     let user;
     try {
       user = await this._userModel.findById(userId).exec();
