@@ -1,6 +1,25 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { QuestionService } from '../Question/question.service';
+import { RequestService } from '../Requests/request.service';
+import { QuestionDto } from '../Question/dto/question.dto';
+
 
 @Controller('bot')
 export class BotController {
+  constructor(private readonly  _questionService: QuestionService,
+              private readonly _requestService: RequestService) {
+  }
+
+  @Get()
+  async getBotQuestions(): Promise<QuestionDto[]> {
+    const Questions = await this._questionService.getQuestions();
+    return Questions;
+  }
+
+  @Post('requestId&score')
+  async insertScore(@Param('requestId') requestId: string, @Param('score') score: number): Promise<string> {
+    const result = await this._requestService.insertScore(requestId, score);
+    return result;
+  }
 
 }

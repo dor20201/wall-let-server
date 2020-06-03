@@ -54,11 +54,4 @@ export class FinancialController {
 
   }
 
-  @Post()
-  addser() {
-
-  };
-
-
-
 }

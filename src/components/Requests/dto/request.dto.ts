@@ -10,4 +10,5 @@ export class RequestDto {
   friendsConfirmation:[{string,boolean}];
   botConfirmation:boolean;
   confirmationStatus:string; //accept denied open
+  score:number;
 }

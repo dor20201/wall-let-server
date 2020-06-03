@@ -4,22 +4,28 @@ import { Request } from './request.model';
 import { Model } from 'mongoose';
 import { RequestDto } from './dto/request.dto';
 import { NotificationService } from '../Notification/notification.service';
-import {UserService} from '../Users/user.service';
+import { UserService } from '../Users/user.service';
+import { MailService } from '../Mail/mail.service';
+import { Mail } from '../Mail/mail.model';
 
 @Injectable()
 export class RequestService {
-
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
-              private _notificationService: NotificationService,private _userService:UserService) {
+              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService) {
   }
 
   async createRequest(requestDto: RequestDto): Promise<string> {
-    const newRequest = new this._requestModel(requestDto);
-    const result = await newRequest.save();
-    // add Notification
-    return result._id;
-  }
+    try {
+      const newRequest = new this._requestModel(requestDto);
+      const result = await newRequest.save();
+      const emails = requestDto.friendsConfirmation.map(c => c.string);
+      await this._mailService.sendMails(emails,'new request from ' +requestDto.email,'your friend'+requestDto.email + 'send you a new request');
+      return result._id;
+    } catch (e) {
+      throw new NotFoundException('could not create Request');
 
+    }
+  }
 
   getRequests(userType: string, confirmationStatus: string, Email: string): Promise<Request[]> {
 
@@ -43,11 +49,9 @@ export class RequestService {
     }
   }
 
-
   async getRequestById(id: string): Promise<Request> {
     return this._requestModel.findOne({ '_id': id }).exec();
   }
-
 
   async reactToRequest(id: string, email: string, answer: string) {
     let request;
@@ -65,27 +69,47 @@ export class RequestService {
 
   private async isRequestApprove(id: string) {
     const request = await this.getRequestById(id);
-    const totalFriends:number = request.friendsConfirmation.length;
-    const approvedNum:number = request.friendsConfirmation.map(o => o[1] == true).length;
-    if(totalFriends < 2* approvedNum){
-      request.confirmationStatus = "approved";
-      // add Notification
+    const totalFriends: number = request.friendsConfirmation.length;
+    const approvedNum: number = request.friendsConfirmation.map(o => o[1] == true).length;
+    if (totalFriends < 2 * approvedNum) {
+      request.confirmationStatus = 'approved';
       await request.save();
+      const mail:Mail = {
+        sendTo : request.email,
+        subject: "Your request as been approved",
+        content : "Your request to buy "+ request.description + 'as been approved :) '
+
+      }
+      await this._mailService.sendMail(mail);
     }
   }
 
-   async approveByPass(userId:string,requestId): Promise<string>{
+  async approveByPass(userId: string, requestId): Promise<string> {
     const request = await this.getRequestById(requestId);
     const user = await this._userService.getUserById(userId);
-    if(user.passes > 0){
-      request.confirmationStatus = "approved";
-      user.passes = user.passes - 1 ;
+    if (user.passes > 0) {
+      request.confirmationStatus = 'approved';
+      user.passes = user.passes - 1;
       await user.save();
-      return 'approved';
+      const mail:Mail = {
+        sendTo : request.email,
+        subject: "Your request as been approved",
+        content : "Your request to buy "+ request.description + 'as been approved :) '
+      }
+      await this._mailService.sendMail(mail);
+      return 'Request '+ requestId + 'as been approved' ;
     }
     return 'User dont have passes';
   }
+
+  async insertScore(requestId:string,score:number):Promise<string>{
+    const request = await this.getRequestById(requestId);
+    request.score = score;
+    await  request.save();
+    return "score insert correctly"
+  }
 }
+
 
 
 

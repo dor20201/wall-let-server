@@ -6,14 +6,14 @@ import {UserModule} from './components/Users/user.module';
 import  {BusinessModule} from './components/Business/business.module';
 import {RequestModule} from './components/Requests/request.module';
 import { NotificationService } from './components/Notification/notification.service';
-import { UserService } from './components/Users/user.service';
+import {MailModule} from './components/Mail/mail.module';
 import { FinancialModule } from './components/Financial/financial.module';
 
 
 @Module({
   imports: [MongooseModule.forRoot(
     'mongodb+srv://admin:admin@walllet-oykbx.mongodb.net/test?retryWrites=true&w=majority'
-  ),UserModule,BusinessModule,RequestModule, NotificationService, FinancialModule],
+  ),UserModule,BusinessModule,RequestModule, NotificationService, FinancialModule, MailModule],
   controllers: [AppController],
   providers: [AppService],
   exports:[AppService]
