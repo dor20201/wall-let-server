@@ -13,8 +13,8 @@ export class MailService {
       port: 465,
       secure: true, // true for 465, false for other ports
       auth: {
-        user: 'dor20201@gmail.com', // generated ethereal user
-        pass: 'vtqrpseyjuuntnon', // generated ethereal password
+        user: "dor20201@cs.colman.ac.il", // generated ethereal user
+        pass: "opqzoitcbwjajqvh" // generated ethereal password
       },
       tls: {
         rejectUnauthorized: false,

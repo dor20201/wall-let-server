@@ -76,8 +76,8 @@ export class RequestService {
       await request.save();
       const mail:Mail = {
         sendTo : request.email,
-        subject: "Your request as been approved",
-        content : "Your request to buy "+ request.description + 'as been approved :) '
+        subject: "Your request has been approved",
+        content : "Your request to buy "+ request.description + 'has been approved :) '
 
       }
       await this._mailService.sendMail(mail);
@@ -93,11 +93,11 @@ export class RequestService {
       await user.save();
       const mail:Mail = {
         sendTo : request.email,
-        subject: "Your request as been approved",
+        subject: "Your request has been approved",
         content : "Your request to buy "+ request.description + 'as been approved :) '
       }
       await this._mailService.sendMail(mail);
-      return 'Request '+ requestId + 'as been approved' ;
+      return 'Request '+ requestId + 'has been approved' ;
     }
     return 'User dont have passes';
   }
