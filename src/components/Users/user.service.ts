@@ -79,8 +79,8 @@ export class UserService {
       if (userDto.phoneNumber) {
         updateUser.phoneNumber = userDto.phoneNumber;
       }
-      if (userDto.dateOfBirth) {
-        updateUser.dateOfBirth = userDto.dateOfBirth;
+      if (userDto.yearOfBirth) {
+        updateUser.yearOfBirth = userDto.yearOfBirth;
       }
       if (userDto.maritalStatus) {
         updateUser.maritalStatus = userDto.maritalStatus;

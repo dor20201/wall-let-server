@@ -5,9 +5,9 @@ export class UserDto {
   email: string;
   password: string;
   answerPassword: string;
-  phoneNumber: number;
-  dateOfBirth: string;
-  maritalStatus: string;
+  phoneNumber: string;
+  yearOfBirth: number;
+  maritalStatus: number;
   addictedStatus: number;
   myTarget:number;
   walletMember: boolean;
