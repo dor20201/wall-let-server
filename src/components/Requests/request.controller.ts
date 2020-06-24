@@ -14,6 +14,22 @@ export class RequestController {
     return await this._requestModel.getRequests(userType, 'All', email);
   }
 
+
+  @Get(':email')
+  async getRequestIApproved(@Param('email') email: string): Promise<Request[]> {
+    return this._requestModel.requestsIApproved(email);
+  }
+
+  @Get('category')
+  async getRequestsByCategory(@Param('category') category: string): Promise<Request[]> {
+    return this._requestModel.requestsByCategory(category);
+  }
+
+  @Get(':email&:status')
+  async getRequestsByStatus(@Param('email') email: string, @Param('status') status: string): Promise<Request[]> {
+    return this._requestModel.requestsByStatus(email, status);
+  }
+
   // Get request by userType (walletMember, FriendMember) & confirmationStatus (open,approved,inProcess) & email
   @Get(':userType&:confirmationStatus&:email')
   async getRequestByConfirmationStatus(@Param('confirmationStatus') confirmationStatus: string,

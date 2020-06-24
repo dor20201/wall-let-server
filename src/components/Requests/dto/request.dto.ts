@@ -1,6 +1,8 @@
 export class RequestDto {
   id: string;
   email: string;
+  openedDate:number;
+  closedDate:number;
   category:string;
   cost:number;
   description:string;

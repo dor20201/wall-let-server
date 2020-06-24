@@ -13,10 +13,13 @@ export class UserController {
     return this._userService.getUserById(userId);
   }
 
+
   @Post()
   getUsersByEmails(@Body('emails') emails:[string]){
     return this._userService.getUsersByEmails(emails);
   }
+
+
   //checked
   @Post('logIn')
   signIn(@Body('email') userEmail: string,
