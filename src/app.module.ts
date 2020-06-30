@@ -17,9 +17,7 @@ import { FinancialModule } from './components/Financial/financial.module';
     'mongodb+srv://admin:admin@walllet-oykbx.mongodb.net/test?retryWrites=true&w=majority'
   ),UserModule,BusinessModule,RequestModule, NotificationService,MailModule,QuestionModule,StatisticsModule, FinancialModule],
   controllers: [AppController],
-  providers: [AppService],
-  exports:[AppService]
-
+  providers: [AppService]
 })
 export class AppModule {
 

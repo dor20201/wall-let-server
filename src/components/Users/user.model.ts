@@ -17,6 +17,8 @@ export const UserSchema = new mongoose.Schema({
   myFixedExpenses: { type: [{ name: String, expense: Number }], required: true },
   myFixedIncomes: { type: [{ name: String, income: Number }], required: true },
   passes: { type: Number, required: true },
+  creditCardId: {type: String},
+  stripMemberId: {type: String}
 });
 
 export interface User extends mongoose.Document {
@@ -37,4 +39,6 @@ export interface User extends mongoose.Document {
   myFixedExpenses: [{ name: string, expense: number }];
   myFixedIncomes: [{ name: string, income: number }];
   passes: number;
+  creditCardId: string;
+  stripMemberId: string;
 }

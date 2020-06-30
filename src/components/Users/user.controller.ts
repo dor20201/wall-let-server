@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { User } from './user.model';
+import { stripeData } from '../Financial/stripeData';
 
 @Controller('user')
 export class UserController {
@@ -31,6 +32,10 @@ export class UserController {
   // need to fix incomes and Expenses
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
+    if(userDto.walletMember) {
+      userDto.stripMemberId = await stripeData.createCustomer(userDto);
+    }
+
     const user = await this._userService.insertUser(userDto);
     return user;
   };
