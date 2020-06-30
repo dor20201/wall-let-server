@@ -13,7 +13,7 @@ export interface CreditCard extends mongoose.Document {
   companyName: string;
   creditCardNumber: number;
   valid: Date;
-  cvc: number;
+  cvc: string;
 }
 
 export const TransactionSchema = new mongoose.Schema({
