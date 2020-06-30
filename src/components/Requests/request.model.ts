@@ -2,6 +2,8 @@ import * as mongoose from 'mongoose';
 
 export const RequestSchema = new mongoose.Schema({
   email: { type: String, required: true },
+  openDate:{type:Number,required:true},
+  closedDate:{type:Number,required:true},
   category: { type: String, required: true },
   cost: { type: Number, required: true },
   description: { type: String, required: true },
@@ -18,6 +20,8 @@ export const RequestSchema = new mongoose.Schema({
 export interface Request extends mongoose.Document {
   id: string
   email: string
+  openDate:number
+  closedDate:number
   category: string
   cost: number;
   description: string

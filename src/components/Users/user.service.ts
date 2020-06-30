@@ -20,7 +20,7 @@ export class UserService {
     }
   }
 
-  async getUserById(userId: string) : Promise<User> {
+  async getUserById(userId: string): Promise<User> {
     let user;
     try {
       user = await this._userModel.findById(userId).exec();
@@ -79,8 +79,8 @@ export class UserService {
       if (userDto.phoneNumber) {
         updateUser.phoneNumber = userDto.phoneNumber;
       }
-      if (userDto.dateOfBirth) {
-        updateUser.dateOfBirth = userDto.dateOfBirth;
+      if (userDto.yearOfBirth) {
+        updateUser.yearOfBirth = userDto.yearOfBirth;
       }
       if (userDto.maritalStatus) {
         updateUser.maritalStatus = userDto.maritalStatus;
@@ -115,7 +115,12 @@ export class UserService {
     }
   }
 
+
+  async getUserByEmail(email: string): Promise<User> {
+    const user = await this._userModel.findOne({ 'email': email });
+    return user;
   }
+}
 
 
 

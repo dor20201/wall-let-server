@@ -19,7 +19,7 @@ export class RequestService {
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
       const emails = requestDto.friendsConfirmation.map(c => c.string);
-      await this._mailService.sendMails(emails,'new request from ' +requestDto.email,'your friend'+requestDto.email + 'send you a new request');
+      await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
       return result._id;
     } catch (e) {
       throw new NotFoundException('could not create Request');
@@ -73,13 +73,14 @@ export class RequestService {
     const approvedNum: number = request.friendsConfirmation.map(o => o[1] == true).length;
     if (totalFriends < 2 * approvedNum) {
       request.confirmationStatus = 'approved';
+      request.closedDate = Date.now();
       await request.save();
-      const mail:Mail = {
-        sendTo : request.email,
-        subject: "Your request as been approved",
-        content : "Your request to buy "+ request.description + 'as been approved :) '
+      const mail: Mail = {
+        sendTo: request.email,
+        subject: 'Your request has been approved',
+        content: 'Your request to buy ' + request.description + 'has been approved :) ',
 
-      }
+      };
       await this._mailService.sendMail(mail);
     }
   }
@@ -89,24 +90,69 @@ export class RequestService {
     const user = await this._userService.getUserById(userId);
     if (user.passes > 0) {
       request.confirmationStatus = 'approved';
+      request.closedDate = Date.now();
       user.passes = user.passes - 1;
       await user.save();
-      const mail:Mail = {
-        sendTo : request.email,
-        subject: "Your request as been approved",
-        content : "Your request to buy "+ request.description + 'as been approved :) '
-      }
+      const mail: Mail = {
+        sendTo: request.email,
+        subject: 'Your request has been approved',
+        content: 'Your request to buy ' + request.description + 'as been approved :) ',
+      };
       await this._mailService.sendMail(mail);
-      return 'Request '+ requestId + 'as been approved' ;
+      return 'Request ' + requestId + 'has been approved';
     }
     return 'User dont have passes';
   }
 
-  async insertScore(requestId:string,score:number):Promise<string>{
+  async insertScore(requestId: string, score: number): Promise<string> {
     const request = await this.getRequestById(requestId);
     request.score = score;
-    await  request.save();
-    return "score insert correctly"
+    await request.save();
+    return 'score insert correctly';
+  }
+
+  async moneySavedSinceEver(email: string): Promise<number> {
+    const requests: Request[] = await this._requestModel.find({ 'email': email, 'confirmationStatus': 'unApproved' });
+    return requests.map(r => r.cost).reduce(function(a: number, b: number) {
+      return a + b;
+    });
+  }
+
+  async moneySavedForMyBuddy(myEmail: string, myFriendEmail: string): Promise<number> {
+    const requests: Request[] = await this._requestModel.find({
+      'email': myFriendEmail,
+      'friendsConfirmation.email': { $contains: myEmail },
+    });
+    return requests.map(r => r.cost).reduce(function(a: number, b: number) {
+      return a + b;
+    });
+  }
+
+  async requestsIApproved(myEmail): Promise<Request[]> {
+    return this._requestModel.find({ 'friendsConfirmation.email': { $contains: myEmail } });
+  }
+
+  async requestsByCategory(category: string): Promise<Request[]> {
+    return this._requestModel.find({ 'category': category });
+  }
+
+  async requestsByStatus(email: string, status: string): Promise<Request[]> {
+    return this._requestModel.find({ 'email': email, 'status': status });
+  }
+
+  async howMuchISpentThisMonth(email: string) {
+    const d = new Date();
+    const month = d.getMonth();
+    const year = d.getFullYear();
+    const requests: Request[] = await this._requestModel.find({
+      'email': email,
+      'confirmationStatus': 'approved',
+      'openedDate': { $lt: new Date(), $gt: new Date(year + ',' + month) },
+    });
+
+    return requests.map(r => r.cost).reduce(function(a: number, b: number) {
+      return a + b;
+    });
   }
 }
 
