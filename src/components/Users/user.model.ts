@@ -8,15 +8,15 @@ export const UserSchema = new mongoose.Schema({
   answerPassword: { type: String, required: true },
   phoneNumber: { type: String, required: true },
   yearOfBirth: { type: Number, required: true },
-  maritalStatus: { type: Number, required: true },
-  addictedStatus: { type: Number, required: true },
-  myTarget: { type: Number, required: true },
-  walletMember: { type: Boolean, required: true },
-  friendMember: { type: Boolean, required: true },
-  myWalletMembers: { type: [String], required: true },
-  myFixedExpenses: { type: [{ name: String, expense: Number }], required: true },
-  myFixedIncomes: { type: [{ name: String, income: Number }], required: true },
-  passes: { type: Number, required: true },
+  maritalStatus: { type: Number, default:null },
+  addictedStatus: { type: Number, default:null },
+  myTarget: { type: Number, default:null },
+  walletMember: { type: Boolean, default:null },
+  friendMember: { type: Boolean, default:null},
+  myWalletMembers: { type: [String], default:null },
+  myFixedExpenses: { type: [{ name: String, expense: Number }],default:null },
+  myFixedIncomes: { type: [{ name: String, income: Number }],default:null },
+  passes: { type: Number,  default:5}
 });
 
 export interface User extends mongoose.Document {

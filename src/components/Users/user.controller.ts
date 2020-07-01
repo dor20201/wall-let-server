@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto/user.dto';
+import { UserDto, WalletMemberDto } from './dto/user.dto';
 import { User } from './user.model';
 
 @Controller('user')
@@ -8,27 +8,20 @@ export class UserController {
   constructor(private _userService: UserService) {
   }
 
+  //checked
   @Get(':id')
   getUser(@Param('id') userId: string) {
     return this._userService.getUserById(userId);
   }
 
-
-  @Post()
-  getUsersByEmails(@Body('emails') emails:[string]){
-    return this._userService.getUsersByEmails(emails);
-  }
-
-
   //checked
   @Post('logIn')
-  signIn(@Body('email') userEmail: string,
+  logIn(@Body('email') userEmail: string,
          @Body('password') userPassword: string) {
     return this._userService.getUserByPassword(userEmail, userPassword);
   }
 
-//checked
-  // need to fix incomes and Expenses
+  //checked
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
     const user = await this._userService.insertUser(userDto);
@@ -43,9 +36,23 @@ export class UserController {
     return isItTrue;
   }
 
-//checked
   @Patch()
-  async updateUser(@Body() userDto: UserDto): Promise<User> {
-    return await this._userService.updateUser(userDto);
+  async updateUser(@Body('walletMemberDto')walletMemberDto: WalletMemberDto): Promise<User> {
+    return await this._userService.updateUser(walletMemberDto);
+  }
+
+  @Post('updatePassword')
+  async updatePassword(@Body('userId') userId:string,@Body('newPassword')newPassword: string): Promise<string> {
+    return  await this._userService.updatePassword(userId,newPassword);
+  };
+
+  @Post('addWalletMember')
+  async addWalletMember(@Body('userId') userId:string,@Body('friendEmail')friendEmail: string): Promise<User> {
+    return  await this._userService.addWalletMember(userId,friendEmail);
+  };
+
+  @Post()
+  getUsersByEmails(@Body('emails') emails:[string]){
+    return this._userService.getUsersByEmails(emails);
   }
 }

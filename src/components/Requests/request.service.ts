@@ -132,8 +132,8 @@ export class RequestService {
     return this._requestModel.find({ 'friendsConfirmation.email': { $contains: myEmail } });
   }
 
-  async requestsByCategory(category: string): Promise<Request[]> {
-    return this._requestModel.find({ 'category': category });
+  async requestsByCategory(email:string,category: string): Promise<Request[]> {
+    return this._requestModel.find({ 'email':email,'category': category });
   }
 
   async requestsByStatus(email: string, status: string): Promise<Request[]> {

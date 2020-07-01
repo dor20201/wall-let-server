@@ -7,13 +7,20 @@ export class UserDto {
   answerPassword: string;
   phoneNumber: string;
   yearOfBirth: number;
+  friendMember: boolean;
+}
+
+
+export class WalletMemberDto{
+  id:string;
   maritalStatus: number;
   addictedStatus: number;
   myTarget:number;
   walletMember: boolean;
-  friendMember: boolean;
   myWalletMembers: string[];
   myFixedExpenses: [{ name: string, expense: number }];
   myFixedIncomes: [{ name: string, income: number }];
   passes: number;
 }
+
+
