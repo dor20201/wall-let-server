@@ -3,6 +3,7 @@ import { FinancialService } from './financial.service';
 import validate from 'validate.js';
 import { UserService } from '../Users/user.service';
 import { NotificationService } from '../Notification/notification.service';
+import { User } from '../Users/user.model';
 //import Stripe from "stripe";
 
 @Controller('financial')
@@ -11,26 +12,30 @@ export class FinancialController {
   }
 
 
-  // @Post("transaction")
-  // MakeATransaction(@Body('userId') userId: string) {
-  //
-  //
-  //   this.financialService.insertTransaction(userId,
-  //     companyName,
-  //     cardNumber,
-  //     valid,
-  //     cvc).then();
-  //   return "success"
-  //
-  // }
+  @Post("transaction")
+  async MakeATransaction(@Body('userId') userId: string) {
+    userId = '5efb52a6d0ed16402c0133e3';
+    const user: User = await this._userService.getUserById(userId);
+    const price = 10.35;
+
+
+    this.financialService.insertTransaction(user,
+      'aaaa',
+      price,
+      new Date(),
+      ).then();
+    return "success"
+
+  }
 
   @Post("creditCard")
   async addCreditCard(@Body('userId') userId: string,
                 @Body('companyName') companyName: string,
-                @Body('cardNumber') cardNumber: number,
-                @Body('valid') valid: Date,
+                @Body('cardNumber') cardNumber: string,
+                @Body('valid') valid: number,
                 @Body('cvc') cvc: string) {
     const user = await this._userService.getUserById(userId);
+    const validDate = new Date(valid);
 
     // Check if the details are valid
     if (user == null || !user.walletMember) {
@@ -41,17 +46,17 @@ export class FinancialController {
 
 
     // Check if the details are valid
-    if(validate({creditCardNumber: cardNumber}, constraints) &&
-      (/^\d{3,4}$/).test(cvc)) {
+    // if(validate({creditCardNumber: cardNumber}, constraints) &&
+    //   (/^\d{3,4}$/).test(cvc)) {
       this.financialService.insertCreditCard(userId,
         companyName,
         cardNumber,
-        valid,
+        validDate,
         cvc).then();
       return "success"
-    } else {
-      return "Invalid credit card's details"
-    }
+    // } else {
+    //   return "Invalid credit card's details"
+    // }
 
   }
 

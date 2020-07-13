@@ -100,6 +100,12 @@ export class UserService {
       if (userDto.myWalletMembers) {
         updateUser.myWalletMembers = userDto.myWalletMembers;
       }
+      if (userDto.creditCardId) {
+        updateUser.creditCardId = userDto.creditCardId;
+      }
+      if (userDto.stripeCardId) {
+        updateUser.stripeCardId = userDto.stripeCardId;
+      }
       await updateUser.save();
       return updateUser;
     } catch (e) {

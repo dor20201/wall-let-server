@@ -33,7 +33,7 @@ export class UserController {
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
     if(userDto.walletMember) {
-      userDto.stripMemberId = await stripeData.createCustomer(userDto);
+      userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(userDto);
     }
 
     const user = await this._userService.insertUser(userDto);

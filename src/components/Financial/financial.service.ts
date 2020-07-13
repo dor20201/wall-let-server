@@ -3,6 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from "mongoose";
 import { CreditCard, Transaction } from '../Financial/financial.model';
 import { UserService } from '../Users/user.service';
+import { stripeData } from './stripeData';
+import { User } from '../Users/user.model';
+import { UserDto } from '../Users/dto/user.dto';
 
 @Injectable()
 export class FinancialService {
@@ -10,7 +13,7 @@ export class FinancialService {
               @InjectModel('Transaction') private readonly _transactionModel: Model<Transaction>, private _userService: UserService) {
   }
 
-  async insertCreditCard(walletMemberId: string, companyName: string, creditCardNumber: number, valid: Date, cvc: string) {
+  async insertCreditCard(walletMemberId: string, companyName: string, creditCardNumber: string, valid: Date, cvc: string) {
 
     const user = await this._userService.getUserById(walletMemberId);
 
@@ -46,36 +49,46 @@ export class FinancialService {
       return null;
     }
 
-    const newCreditCard = await this._creditCardModel.findOne({ 'walletMemberId': walletMemberId }).exec();
+    const newCreditCard : any = await this._creditCardModel.findOne({ 'walletMemberId': walletMemberId }).exec();
 
-
-    return newCreditCard;
+    return newCreditCard && newCreditCard._doc;
   }
 
-  async insertTransaction(walletMemberId: string, business: string, price: number, date: Date) {
+  async insertTransaction(walletMember: User, business: string, price: number, date: Date) {
 
     // Maybe to remove to the controller
-    const creditCard = await this.findCreditCardByWalletMemberId(walletMemberId);
+    const creditCard = await this.findCreditCardByWalletMemberId(walletMember._id.toString());
 
-    // Check if the details are valid
-    if (creditCard == null) {
-      return "credit card doesnt exist";
+    if (!creditCard) {
+      return null;
     }
-    // Check if there is enough money for the transaction
+
+    const walletMemberId = walletMember._id.toString();
+
+    // Check if stripe card exist
+    if (!walletMember.stripeCardId) {
+      const userDto = new UserDto();
+      userDto.id = walletMemberId;
+      userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(walletMember);
+      walletMember = await this._userService.updateUser(userDto);
+    }
+
 
     // Create token for transaction
+    const creditCardToken = await stripeData.createCreditCardToken(creditCard);
 
     // Make transaction
+    await stripeData.loadPrepaidCard(creditCardToken, price, walletMember.stripeCardId);
 
     const newTransaction = new this._transactionModel({
       walletMemberId,
       business,
       price,
-      date
+      date,
     });
 
     const result = await newTransaction.save();
 
-    return result._id;
+    return creditCardToken;
   }
 }

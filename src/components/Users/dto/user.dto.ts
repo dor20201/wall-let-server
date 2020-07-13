@@ -17,5 +17,5 @@ export class UserDto {
   myFixedIncomes: [{ name: string, income: number }];
   passes: number;
   creditCardId: string;
-  stripMemberId: string;
+  stripeCardId: string;
 }
