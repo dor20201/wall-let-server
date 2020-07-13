@@ -18,14 +18,13 @@ export interface CreditCard extends mongoose.Document {
 
 export const TransactionSchema = new mongoose.Schema({
   walletMemberId: { type: 'ObjectId', required: true, ref: 'User' },
-  business: { type: String, required: true },
-  price:{ type: Number, required:true},
+  requestId: { type: String, required: true },
   date:{ type: Date, required: true}
 });
 
 export interface Transaction extends mongoose.Document {
   walletMemberId: string;
-  business: string;
+  requestId: string;
   price: number;
   date: Date;
 }

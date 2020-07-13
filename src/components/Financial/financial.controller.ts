@@ -4,28 +4,34 @@ import validate from 'validate.js';
 import { UserService } from '../Users/user.service';
 import { NotificationService } from '../Notification/notification.service';
 import { User } from '../Users/user.model';
+import { RequestService } from '../Requests/request.service';
 //import Stripe from "stripe";
 
 @Controller('financial')
 export class FinancialController {
-  constructor(private financialService: FinancialService, private _userService: UserService) {
+  constructor(private financialService: FinancialService, private _userService: UserService, private _requestService: RequestService) {
   }
 
 
   @Post("transaction")
-  async MakeATransaction(@Body('userId') userId: string) {
-    userId = '5efb52a6d0ed16402c0133e3';
+  async MakeATransaction(@Body('userId') userId: string,
+                         @Body('requestId') requestId: string) {
     const user: User = await this._userService.getUserById(userId);
-    const price = 10.35;
+    const request = await this._requestService.getRequestById(requestId);
 
+    // Check if to do the transaction
+    if ((await this.financialService.findTransactionByRequestId(requestId)) ||
+      !request ||
+      request.confirmationStatus !== "approved" || !user ||
+      user.email !== request.email) {
+      return "Request invalid"
+    }
 
-    this.financialService.insertTransaction(user,
-      'aaaa',
-      price,
+    return await this.financialService.insertTransaction(user,
+      requestId,
+      request.cost,
       new Date(),
-      ).then();
-    return "success"
-
+      );
   }
 
   @Post("creditCard")
@@ -42,48 +48,11 @@ export class FinancialController {
       return "user doesnt exist";
     }
 
-    const constraints = this.creditCardValidation();
-
-
-    // Check if the details are valid
-    // if(validate({creditCardNumber: cardNumber}, constraints) &&
-    //   (/^\d{3,4}$/).test(cvc)) {
-      this.financialService.insertCreditCard(userId,
-        companyName,
-        cardNumber,
-        validDate,
-        cvc).then();
-      return "success"
-    // } else {
-    //   return "Invalid credit card's details"
-    // }
-
-  }
-
-  private creditCardValidation() {
-    const constraints = {
-      creditCardNumber: {
-        presence: true,
-        format: {
-          pattern: /^(34|37|4|5[1-5]).*$/,
-          message: function(value, attribute, validatorOptions, attributes, globalOptions) {
-            return validate.format('^%{num} is not a valid credit card number', {
-              num: value,
-            });
-          },
-        },
-        length: function(value, attributes, attributeName, options, constraints) {
-          if (value) {
-            // Amex
-            if ((/^(34|37).*$/).test(value)) return { is: 15 };
-            // Visa, Mastercard
-            if ((/^(4|5[1-5]).*$/).test(value)) return { is: 16 };
-          }
-          // Unknown card, don't validate length
-          return false;
-        },
-      },
-    };
-    return constraints;
+    this.financialService.insertCreditCard(userId,
+      companyName,
+      cardNumber,
+      validDate,
+      cvc).then();
+    return "success"
   }
 }

@@ -54,7 +54,15 @@ export class FinancialService {
     return newCreditCard && newCreditCard._doc;
   }
 
-  async insertTransaction(walletMember: User, business: string, price: number, date: Date) {
+  async findTransactionByRequestId(requestId: string) {
+
+    const transaction: any = await this._transactionModel.findOne({'requestId': requestId});
+
+
+    return transaction && transaction._doc;
+  }
+
+  async insertTransaction(walletMember: User, requestId: string, price: number, date: Date) {
 
     // Maybe to remove to the controller
     const creditCard = await this.findCreditCardByWalletMemberId(walletMember._id.toString());
@@ -82,7 +90,7 @@ export class FinancialService {
 
     const newTransaction = new this._transactionModel({
       walletMemberId,
-      business,
+      requestId: requestId,
       price,
       date,
     });

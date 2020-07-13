@@ -7,11 +7,12 @@ import { NotificationService } from '../Notification/notification.service';
 import { UserService } from '../Users/user.service';
 import { MailService } from '../Mail/mail.service';
 import { Mail } from '../Mail/mail.model';
+import { FinancialService } from '../Financial/financial.service';
 
 @Injectable()
 export class RequestService {
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
-              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService) {
+              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService, private _financialService: FinancialService) {
   }
 
   async createRequest(requestDto: RequestDto): Promise<string> {
@@ -75,6 +76,7 @@ export class RequestService {
       request.confirmationStatus = 'approved';
       request.closedDate = Date.now();
       await request.save();
+
       const mail: Mail = {
         sendTo: request.email,
         subject: 'Your request has been approved',
