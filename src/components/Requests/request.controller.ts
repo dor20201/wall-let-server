@@ -20,9 +20,9 @@ export class RequestController {
     return this._requestModel.requestsIApproved(email);
   }
 
-  @Get('category')
-  async getRequestsByCategory(@Param('category') category: string): Promise<Request[]> {
-    return this._requestModel.requestsByCategory(category);
+  @Get(':email&:category')
+  async getRequestsByCategory(@Param('email') email: string,@Param('category') category: string): Promise<Request[]> {
+    return this._requestModel.requestsByCategory(email,category);
   }
 
   @Get(':email&:status')
