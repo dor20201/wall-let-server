@@ -81,6 +81,9 @@ class StripeData {
       source: token.id,
     });
 
+    // Move after this will be a real stripe account.
+    return charge;
+
     if (charge) {
       const card = await stripe.issuing.cards.retrieve(
         prepaidCardId
@@ -92,6 +95,8 @@ class StripeData {
         prepaidCardId,
         // eslint-disable-next-line @typescript-eslint/camelcase
         {spending_controls: card.spending_controls});
+
+      return charge;
     }
   }
 

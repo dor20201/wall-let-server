@@ -84,6 +84,12 @@ export class RequestService {
 
       };
       await this._mailService.sendMail(mail);
+
+      // Make transaction
+      await this._financialService.insertTransaction(request.email,
+        request,
+        new Date(),
+      );
     }
   }
 
@@ -101,6 +107,12 @@ export class RequestService {
         content: 'Your request to buy ' + request.description + 'as been approved :) ',
       };
       await this._mailService.sendMail(mail);
+
+      // Make transaction
+      await this._financialService.insertTransaction(request.email,
+        request,
+        new Date(),
+      );
       return 'Request ' + requestId + 'has been approved';
     }
     return 'User dont have passes';

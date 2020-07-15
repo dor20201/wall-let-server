@@ -33,7 +33,9 @@ export class UserController {
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
     if(userDto.walletMember) {
-      userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(userDto);
+      // Move after this will be a real stripe account.
+      // userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(userDto);
+      userDto.stripeCardId = 'tok_mastercard_prepaid';
     }
 
     const user = await this._userService.insertUser(userDto);

@@ -12,28 +12,6 @@ export class FinancialController {
   constructor(private financialService: FinancialService, private _userService: UserService, private _requestService: RequestService) {
   }
 
-
-  @Post("transaction")
-  async MakeATransaction(@Body('userId') userId: string,
-                         @Body('requestId') requestId: string) {
-    const user: User = await this._userService.getUserById(userId);
-    const request = await this._requestService.getRequestById(requestId);
-
-    // Check if to do the transaction
-    if ((await this.financialService.findTransactionByRequestId(requestId)) ||
-      !request ||
-      request.confirmationStatus !== "approved" || !user ||
-      user.email !== request.email) {
-      return "Request invalid"
-    }
-
-    return await this.financialService.insertTransaction(user,
-      requestId,
-      request.cost,
-      new Date(),
-      );
-  }
-
   @Post("creditCard")
   async addCreditCard(@Body('userId') userId: string,
                 @Body('companyName') companyName: string,

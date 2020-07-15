@@ -6,11 +6,14 @@ import { UserService } from '../Users/user.service';
 import { stripeData } from './stripeData';
 import { User } from '../Users/user.model';
 import { UserDto } from '../Users/dto/user.dto';
+import { RequestService } from '../Requests/request.service';
+import { Request } from '../Requests/request.model';
 
 @Injectable()
 export class FinancialService {
   constructor(@InjectModel('CreditCard') private readonly _creditCardModel: Model<CreditCard>,
-              @InjectModel('Transaction') private readonly _transactionModel: Model<Transaction>, private _userService: UserService) {
+              @InjectModel('Transaction') private readonly _transactionModel: Model<Transaction>,
+              private _userService: UserService, private _requestService: RequestService) {
   }
 
   async insertCreditCard(walletMemberId: string, companyName: string, creditCardNumber: string, valid: Date, cvc: string) {
@@ -62,22 +65,30 @@ export class FinancialService {
     return transaction && transaction._doc;
   }
 
-  async insertTransaction(walletMember: User, requestId: string, price: number, date: Date) {
+  async insertTransaction(walletMemberEmail: string, request: Request, date: Date) {
 
-    // Maybe to remove to the controller
-    const creditCard = await this.findCreditCardByWalletMemberId(walletMember._id.toString());
+    let walletMember: User = await this._userService.getUserByEmail(walletMemberEmail);
+    const walletMemberId = walletMember._id.toString();
 
-    if (!creditCard) {
+    const creditCard = await this.findCreditCardByWalletMemberId(walletMemberId);
+
+    const requestId = request._id.toString();
+
+    // Check if to do the transaction
+    if ((await this.findTransactionByRequestId(requestId)) ||
+      !request ||
+      request.confirmationStatus !== "approved" || !walletMember ||
+      walletMemberEmail !== request.email || !creditCard) {
       return null;
     }
-
-    const walletMemberId = walletMember._id.toString();
 
     // Check if stripe card exist
     if (!walletMember.stripeCardId) {
       const userDto = new UserDto();
       userDto.id = walletMemberId;
-      userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(walletMember);
+      // Move after this will be a real stripe account.
+      //userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(walletMember);
+      userDto.stripeCardId = 'tok_mastercard_prepaid';
       walletMember = await this._userService.updateUser(userDto);
     }
 
@@ -86,17 +97,17 @@ export class FinancialService {
     const creditCardToken = await stripeData.createCreditCardToken(creditCard);
 
     // Make transaction
-    await stripeData.loadPrepaidCard(creditCardToken, price, walletMember.stripeCardId);
+    await stripeData.loadPrepaidCard(creditCardToken, request.cost, walletMember.stripeCardId);
 
     const newTransaction = new this._transactionModel({
       walletMemberId,
       requestId: requestId,
-      price,
+      price: request.cost,
       date,
     });
 
     const result = await newTransaction.save();
 
-    return creditCardToken;
+    return result;
   }
 }
