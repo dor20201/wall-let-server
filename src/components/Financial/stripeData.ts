@@ -81,7 +81,7 @@ class StripeData {
       source: token.id,
     });
 
-    // Move after this will be a real stripe account.
+    // Remove after this will be a real stripe account.
     return charge;
 
     if (charge) {
