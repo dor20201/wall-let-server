@@ -8,6 +8,9 @@ export class UserDto {
   phoneNumber: string;
   yearOfBirth: number;
   friendMember: boolean;
+  walletMember: boolean;
+  creditCardId: string;
+  stripeCardId: string;
 }
 
 

@@ -92,11 +92,11 @@ export class UserService {
       if (walletMemberDto.myFixedExpenses) {
         updateUser.myFixedExpenses = walletMemberDto.myFixedExpenses;
       }
-      if (userDto.creditCardId) {
-        updateUser.creditCardId = userDto.creditCardId;
+      if (walletMemberDto.creditCardId) {
+        updateUser.creditCardId = walletMemberDto.creditCardId;
       }
-      if (userDto.stripeCardId) {
-        updateUser.stripeCardId = userDto.stripeCardId;
+      if (walletMemberDto.stripeCardId) {
+        updateUser.stripeCardId = walletMemberDto.stripeCardId;
       }
       await updateUser.save();
       return updateUser;
