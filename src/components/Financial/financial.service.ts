@@ -5,15 +5,14 @@ import { CreditCard, Transaction } from '../Financial/financial.model';
 import { UserService } from '../Users/user.service';
 import { stripeData } from './stripeData';
 import { User } from '../Users/user.model';
-import { UserDto } from '../Users/dto/user.dto';
-import { RequestService } from '../Requests/request.service';
+import { UserDto, WalletMemberDto } from '../Users/dto/user.dto';
 import { Request } from '../Requests/request.model';
 
 @Injectable()
 export class FinancialService {
   constructor(@InjectModel('CreditCard') private readonly _creditCardModel: Model<CreditCard>,
               @InjectModel('Transaction') private readonly _transactionModel: Model<Transaction>,
-              private _userService: UserService, private _requestService: RequestService) {
+              private _userService: UserService) {
   }
 
   async insertCreditCard(walletMemberId: string, companyName: string, creditCardNumber: string, valid: Date, cvc: string) {
@@ -84,12 +83,12 @@ export class FinancialService {
 
     // Check if stripe card exist
     if (!walletMember.stripeCardId) {
-      const userDto = new UserDto();
-      userDto.id = walletMemberId;
+      const walletMemberDto = new WalletMemberDto();
+      walletMemberDto.id = walletMemberId;
       // Move after this will be a real stripe account.
       //userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(walletMember);
-      userDto.stripeCardId = 'tok_mastercard_prepaid';
-      walletMember = await this._userService.updateUser(userDto);
+      walletMemberDto.stripeCardId = 'tok_mastercard_prepaid';
+      walletMember = await this._userService.updateUser(walletMemberDto);
     }
 
 
