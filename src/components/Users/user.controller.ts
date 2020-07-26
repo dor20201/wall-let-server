@@ -31,7 +31,7 @@ export class UserController {
   //checked
   @Post(':id')
   async verificationPasswordAnswer(@Param('id') userId: string,
-                                   @Body('answer') answer: string): Promise<boolean> {
+                                     @Body('answer') answer: string): Promise<boolean> {
     const isItTrue = await this._userService.isPasswordAnswerCorrect(userId, answer);
     return isItTrue;
   }
@@ -46,6 +46,7 @@ export class UserController {
     return  await this._userService.updatePassword(userId,newPassword);
   };
 
+  // add friend member to my walletMember list
   @Post('addWalletMember')
   async addWalletMember(@Body('userId') userId:string,@Body('friendEmail')friendEmail: string): Promise<User> {
     return  await this._userService.addWalletMember(userId,friendEmail);

@@ -9,8 +9,8 @@ export class RequestDto {
   necessity:number;
   additionalDescription:string;
   pic: string;
-  friendsConfirmation:[{string,boolean}];
+  friendsConfirmation:[{email: string, confirm:boolean}];
   botConfirmation:boolean;
-  confirmationStatus:string; //accept denied open
+  confirmationStatus:string; //approved,unApproved,open
   score:number;
 }

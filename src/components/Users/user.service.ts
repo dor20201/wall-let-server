@@ -80,6 +80,9 @@ export class UserService {
       if (walletMemberDto.maritalStatus) {
         updateUser.maritalStatus = walletMemberDto.maritalStatus;
       }
+      if (walletMemberDto.walletMember) {
+        updateUser.walletMember = walletMemberDto.walletMember;
+      }
       if (walletMemberDto.addictedStatus) {
         updateUser.addictedStatus = walletMemberDto.addictedStatus;
       }
