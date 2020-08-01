@@ -8,7 +8,7 @@ export class RequestController {
   constructor(private _requestModel: RequestService) {
   }
 
-  // Get request by userType (walletMember, FriendMember)
+  // Get request by userType (walletMember, friendMember)
   @Post('all')
   async getAllRequests(@Body('userType') userType: string,
                        @Body('email') email: string): Promise<Request[]> {
