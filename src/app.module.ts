@@ -9,12 +9,13 @@ import { NotificationService } from './components/Notification/notification.serv
 import {MailModule} from './components/Mail/mail.module';
 import { QuestionModule } from './components/Question/question.module';
 import { StatisticsModule } from './components/Statistics/statistics.module';
+import { BotModule } from './components/Bot/bot.module';
 
 
 @Module({
   imports: [MongooseModule.forRoot(
     'mongodb+srv://admin:admin@walllet-oykbx.mongodb.net/test?retryWrites=true&w=majority'
-  ),UserModule,BusinessModule,RequestModule, NotificationService,MailModule,QuestionModule,StatisticsModule],
+  ),UserModule,BusinessModule,RequestModule, NotificationService,MailModule,QuestionModule,StatisticsModule,BotModule],
   controllers: [AppController],
   providers: [AppService]
 })

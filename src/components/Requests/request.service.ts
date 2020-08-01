@@ -27,6 +27,10 @@ export class RequestService {
     }
   }
 
+  async getAllRequests():Promise<Request[]>{
+    return this._requestModel.find({});
+  }
+
   getRequests(userType: string, confirmationStatus: string, Email: string): Promise<Request[]> {
 
     if (userType == 'friendMember') {
