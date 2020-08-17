@@ -19,13 +19,17 @@ export class RequestService {
     try {
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
-      const emails = requestDto.friendsConfirmation.map(c => c.string);
+      const emails:string[] = requestDto.friendsConfirmation.map(c=> c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
       return result._id;
     } catch (e) {
       throw new NotFoundException('could not create Request');
 
     }
+  }
+
+  async getAllRequests():Promise<Request[]>{
+    return this._requestModel.find({});
   }
 
   getRequests(userType: string, confirmationStatus: string, Email: string): Promise<Request[]> {
@@ -146,12 +150,13 @@ export class RequestService {
     return this._requestModel.find({ 'friendsConfirmation.email': { $contains: myEmail } });
   }
 
-  async requestsByCategory(email:string,category: string): Promise<Request[]> {
-    return this._requestModel.find({ 'email':email,'category': category });
+  async requestsByCategory(email: string, category: string): Promise<Request[]> {
+    return this._requestModel.find({ 'email': email, category: category });
+
   }
 
   async requestsByStatus(email: string, status: string): Promise<Request[]> {
-    return this._requestModel.find({ 'email': email, 'status': status });
+    return this._requestModel.find({ 'email': email, 'confirmationStatus': status });
   }
 
   async howMuchISpentThisMonth(email: string) {
@@ -164,9 +169,14 @@ export class RequestService {
       'openedDate': { $lt: new Date(), $gt: new Date(year + ',' + month) },
     });
 
+    try{
     return requests.map(r => r.cost).reduce(function(a: number, b: number) {
       return a + b;
-    });
+    });}
+    catch (e) {
+      throw new NotFoundException(e)
+    }
+
   }
 }
 

@@ -8,9 +8,10 @@ export class RequestController {
   constructor(private _requestModel: RequestService) {
   }
 
-  // Get request by userType (walletMember, FriendMember)
-  @Get('All')
-  async getAllRequests(@Param('userType') userType: string, @Param('email') email: string): Promise<Request[]> {
+  // Get request by userType (walletMember, friendMember)
+  @Post('all')
+  async getAllRequests(@Body('userType') userType: string,
+                       @Body('email') email: string): Promise<Request[]> {
     return await this._requestModel.getRequests(userType, 'All', email);
   }
 
@@ -20,21 +21,23 @@ export class RequestController {
     return this._requestModel.requestsIApproved(email);
   }
 
-  @Get(':email&:category')
-  async getRequestsByCategory(@Param('email') email: string,@Param('category') category: string): Promise<Request[]> {
+  @Post('getRequestByCategory')
+  async getRequestsByCategory(@Body('email') email: string,
+                              @Body('category') category: string): Promise<Request[]> {
     return this._requestModel.requestsByCategory(email,category);
   }
 
-  @Get(':email&:status')
-  async getRequestsByStatus(@Param('email') email: string, @Param('status') status: string): Promise<Request[]> {
+  @Post('getRequestByStatus')
+  async getRequestsByStatus(@Body('email') email: string,
+                            @Body('status') status: string): Promise<Request[]> {
     return this._requestModel.requestsByStatus(email, status);
   }
 
   // Get request by userType (walletMember, FriendMember) & confirmationStatus (open,approved,inProcess) & email
-  @Get(':userType&:confirmationStatus&:email')
-  async getRequestByConfirmationStatus(@Param('confirmationStatus') confirmationStatus: string,
-                                       @Param('userType') userType: string,
-                                       @Param('email') email: string): Promise<Request[]> {
+  @Post('getRequestByConfirmationStatus')
+  async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: string,
+                                       @Body('userType') userType: string,
+                                       @Body('email') email: string): Promise<Request[]> {
     return await this._requestModel.getRequests(userType, confirmationStatus, email);
   }
 
@@ -50,16 +53,18 @@ export class RequestController {
   }
 
   //for approve of friendMember
-  @Post(':id&email&:answer')
-  async ReactToRequest(@Param('id') id: string, @Param('email') email: string, @Param('answer') answer: string): Promise<string> {
+  @Post('ReactToRequest')
+  async ReactToRequest(@Body('id') id: string,
+                       @Body('email') email: string,
+                       @Body('answer') answer: string): Promise<string> {
     return await this._requestModel.reactToRequest(id, email, answer);
   }
 
   // approve request by the passes,
   // it checks if the user have passes and if he have i am down the passes by 1 and change the confirmationStatus to Approve
-  @Post(':userId&:requestId')
-  async ApproveByPasses(@Param('userId') userId: string,
-                        @Param('RequestId') requestId: string): Promise<string> {
+  @Post('approveByPasses')
+  async ApproveByPasses(@Body('userId') userId: string,
+                        @Body('RequestId') requestId: string): Promise<string> {
 
     return this._requestModel.approveByPass(userId, requestId);
   }

@@ -13,8 +13,8 @@ export class MailService {
       port: 465,
       secure: true, // true for 465, false for other ports
       auth: {
-        user: "dor20201@cs.colman.ac.il", // generated ethereal user
-        pass: "opqzoitcbwjajqvh" // generated ethereal password
+        user: 'dor20201@cs.colman.ac.il', // generated ethereal user
+        pass: 'opqzoitcbwjajqvh', // generated ethereal password
       },
       tls: {
         rejectUnauthorized: false,
@@ -37,7 +37,8 @@ export class MailService {
 
 
       let mail: Mail;
-      for (const email in emails) {
+
+      for (const email of emails) {
         mail = {
           sendTo: email,
           subject: subject,

@@ -10,6 +10,6 @@ import { QuestionModule } from '../Question/question.module';
   controllers: [BotController],
   providers: [BotService],
 })
-export class Bot {
+export class BotModule {
 
 }

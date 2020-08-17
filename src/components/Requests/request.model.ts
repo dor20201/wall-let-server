@@ -2,9 +2,9 @@ import * as mongoose from 'mongoose';
 
 export const RequestSchema = new mongoose.Schema({
   email: { type: String, required: true },
-  openDate:{type:Number,required:true},
-  closedDate:{type:Number,required:true},
-  category: { type: String, required: true },
+  openDate:{type:Number,default:Date.now()},
+  closedDate:{type:Number,default:null},
+  category: { type: [String], required: true },
   cost: { type: Number, required: true },
   description: { type: String, required: true },
   necessity: { type: Number, required: true },
@@ -13,7 +13,7 @@ export const RequestSchema = new mongoose.Schema({
   friendsConfirmation: { type: [{ email: String, confirm: Boolean }], required: true },
   botConfirmation: { type: Boolean, required: true },
   confirmationStatus: { type: String, required: true }, // open ,approved, inProcess,unApproved
-  score:{type:Number,required:true}
+  score:{type:Number,default:null}
 
 });
 

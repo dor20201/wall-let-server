@@ -1,5 +1,5 @@
 export class UserDto {
-  id:string;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -14,11 +14,11 @@ export class UserDto {
 }
 
 
-export class WalletMemberDto{
-  id:string;
+export class WalletMemberDto {
+  id: string;
   maritalStatus: number;
   addictedStatus: number;
-  myTarget:number;
+  myTarget: number;
   walletMember: boolean;
   myWalletMembers: string[];
   myFixedExpenses: [{ name: string, expense: number }];

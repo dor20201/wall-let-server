@@ -1,11 +1,16 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { RequestService } from '../Requests/request.service';
 import { StatisticsService } from './statistics.service';
 
 
-@Controller('bot')
+@Controller('statistics')
 export class StatisticsController {
   constructor(private _statisticsService: StatisticsService, private readonly _requestService: RequestService) {
+  }
+
+  @Get()
+  getDor(){
+    return "Dor"
   }
 
   @Get(':myEmail')
@@ -18,8 +23,8 @@ export class StatisticsController {
     return this._requestService.moneySavedForMyBuddy(myEmail, myFriendEmail);
   }
 
-  @Get('monthMoney&:email')
-  async getMoneyISpentThisMonth(@Param('email') email: string): Promise<number> {
+  @Post('monthMoney')
+  async getMoneyISpentThisMonth(@Body('email') email: string): Promise<number> {
     return this._requestService.howMuchISpentThisMonth(email);
   }
 
