@@ -68,4 +68,10 @@ export class RequestController {
 
     return this._requestModel.approveByPass(userId, requestId);
   }
+
+  @Post('approveByML')
+  async ApproveByML(@Body('RequestId') requestId: string): Promise<string> {
+    return this._requestModel.approveByML(requestId);
+  }
+
 }

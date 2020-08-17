@@ -18,7 +18,7 @@ export class RequestService {
     try {
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
-      const emails:string[] = requestDto.friendsConfirmation.map(c=> c.email);
+      const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
       return result._id;
     } catch (e) {
@@ -27,7 +27,7 @@ export class RequestService {
     }
   }
 
-  async getAllRequests():Promise<Request[]>{
+  async getAllRequests(): Promise<Request[]> {
     return this._requestModel.find({});
   }
 
@@ -95,12 +95,13 @@ export class RequestService {
     if (user.passes > 0) {
       request.confirmationStatus = 'approved';
       request.closedDate = Date.now();
+      await request.save();
       user.passes = user.passes - 1;
       await user.save();
       const mail: Mail = {
         sendTo: request.email,
         subject: 'Your request has been approved',
-        content: 'Your request to buy ' + request.description + 'as been approved :) ',
+        content: 'Your request to buy ' + request.description + ' has been approved :) ',
       };
       await this._mailService.sendMail(mail);
       return 'Request ' + requestId + 'has been approved';
@@ -108,11 +109,26 @@ export class RequestService {
     return 'User dont have passes';
   }
 
+  async approveByML(requestId): Promise<string> {
+    const request = await this.getRequestById(requestId);
+    request.confirmationStatus = 'approved';
+    request.closedDate = Date.now();
+    await request.save();
+    const mail: Mail = {
+      sendTo: request.email,
+      subject: 'Your request has been approved',
+      content: 'Your request to buy ' + request.description + ' has been approved :) ',
+    };
+    await this._mailService.sendMail(mail);
+    return 'Request ' + requestId + 'has been approved';
+  }
+
+
   async insertScore(requestId: string, score: number): Promise<string> {
     const request = await this.getRequestById(requestId);
-    request.score = score;
+    request.botScore = score;
     await request.save();
-    return 'score insert correctly';
+    return 'botScore insert correctly';
   }
 
   async moneySavedSinceEver(email: string): Promise<number> {
@@ -155,12 +171,12 @@ export class RequestService {
       'openedDate': { $lt: new Date(), $gt: new Date(year + ',' + month) },
     });
 
-    try{
-    return requests.map(r => r.cost).reduce(function(a: number, b: number) {
-      return a + b;
-    });}
-    catch (e) {
-      throw new NotFoundException(e)
+    try {
+      return requests.map(r => r.cost).reduce(function(a: number, b: number) {
+        return a + b;
+      });
+    } catch (e) {
+      throw new NotFoundException(e);
     }
 
   }

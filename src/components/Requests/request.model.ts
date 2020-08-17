@@ -6,14 +6,13 @@ export const RequestSchema = new mongoose.Schema({
   closedDate:{type:Number,default:null},
   category: { type: [String], required: true },
   cost: { type: Number, required: true },
-  description: { type: String, required: true },
+  description: { type: String,default:null},
   necessity: { type: Number, required: true },
-  additionalDescription: { type: String, required: true },
-  pic: { type: String, required: true },
+  additionalDescription: { type: String,default:null},
+  pic: { type: String, default:null},
   friendsConfirmation: { type: [{ email: String, confirm: Boolean }], required: true },
-  botConfirmation: { type: Boolean, required: true },
   confirmationStatus: { type: String, required: true }, // open ,approved, inProcess,unApproved
-  score:{type:Number,default:null}
+  botScore:{type:Number,default:null}
 
 });
 
@@ -29,9 +28,6 @@ export interface Request extends mongoose.Document {
   additionalDescription: string;
   pic: string;
   friendsConfirmation: [{string,boolean}];
-  botConfirmation: boolean;
   confirmationStatus: string;// open ,approved, inProcess;
-  score:number
-
-
+  botScore:number
 }

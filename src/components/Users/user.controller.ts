@@ -29,10 +29,10 @@ export class UserController {
   };
 
   //checked
-  @Post(':id')
-  async verificationPasswordAnswer(@Param('id') userId: string,
+  @Post('verificationPasswordAnswer')
+  async verificationPasswordAnswer(@Body('email') email: string,
                                      @Body('answer') answer: string): Promise<boolean> {
-    const isItTrue = await this._userService.isPasswordAnswerCorrect(userId, answer);
+    const isItTrue = await this._userService.isPasswordAnswerCorrect(email, answer);
     return isItTrue;
   }
 
@@ -42,8 +42,8 @@ export class UserController {
   }
 
   @Post('updatePassword')
-  async updatePassword(@Body('userId') userId:string,@Body('newPassword')newPassword: string): Promise<string> {
-    return  await this._userService.updatePassword(userId,newPassword);
+  async updatePassword(@Body('email') email:string,@Body('newPassword')newPassword: string): Promise<string> {
+    return  await this._userService.updatePassword(email,newPassword);
   };
 
   // add friend member to my walletMember list
