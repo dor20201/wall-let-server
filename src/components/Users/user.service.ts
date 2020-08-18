@@ -53,10 +53,10 @@ export class UserService {
     return user;
   }
 
-  async isPasswordAnswerCorrect(userId: string, answer: string) {
+  async isPasswordAnswerCorrect(email: string, answer: string) {
     let user;
     try {
-      user = await this.getUserById(userId);
+      user = await this._userModel.findOne({email:email}).exec();
       if (user.answerPassword == answer) {
         return true;
       }
@@ -66,8 +66,8 @@ export class UserService {
     }
   }
 
-  async updatePassword(userId: string, newPassword: string){
-    const user:User = await this.getUserById(userId);
+  async updatePassword(email: string, newPassword: string){
+    const user:User = await this._userModel.findOne({email:email}).exec();
     user.password = newPassword;
     await user.save();
     return "Password updated successfully"
