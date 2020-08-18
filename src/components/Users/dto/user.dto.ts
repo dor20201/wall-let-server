@@ -8,6 +8,9 @@ export class UserDto {
   phoneNumber: string;
   yearOfBirth: number;
   friendMember: boolean;
+  walletMember: boolean;
+  creditCardId: string;
+  stripeCardId: string;
 }
 
 
@@ -21,6 +24,8 @@ export class WalletMemberDto {
   myFixedExpenses: [{ name: string, expense: number }];
   myFixedIncomes: [{ name: string, income: number }];
   passes: number;
+  creditCardId: string;
+  stripeCardId: string;
 }
 
 
