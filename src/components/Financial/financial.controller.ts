@@ -23,10 +23,12 @@ export class FinancialController {
   async addCreditCard(@Body('userId') userId: string,
                 @Body('companyName') companyName: string,
                 @Body('cardNumber') cardNumber: string,
-                @Body('valid') valid: number,
+                @Body('valid') valid: string,
                 @Body('cvc') cvc: string) {
     const user = await this._userService.getUserById(userId);
-    const validDate = new Date(valid);
+    const dateParts = valid.toString().split("/");
+
+    const validDate = new Date(Number('20' + dateParts[1]), +dateParts[0], 1);
 
     // Check if the details are valid
     if (user == null || !user.walletMember) {
