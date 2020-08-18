@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.model';
 import { Model } from 'mongoose';
 import { UserDto, WalletMemberDto } from './dto/user.dto';
+import { stripeData } from '../Financial/stripeData';
 
 @Injectable()
 export class UserService {
@@ -82,6 +83,11 @@ export class UserService {
       }
       if (walletMemberDto.walletMember) {
         updateUser.walletMember = walletMemberDto.walletMember;
+        if (!updateUser.walletMember) {
+          // Move after this will be a real stripe account.
+          //walletMemberDto.stripeCardId = await stripeData.creatPrepaidCreditCard(updateUser);
+          walletMemberDto.stripeCardId = 'tok_mastercard_prepaid';
+        }
       }
       if (walletMemberDto.addictedStatus) {
         updateUser.addictedStatus = walletMemberDto.addictedStatus;

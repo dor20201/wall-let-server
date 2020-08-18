@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, WalletMemberDto } from './dto/user.dto';
 import { User } from './user.model';
-import { stripeData } from '../Financial/stripeData';
 
 @Controller('user')
 export class UserController {
@@ -25,11 +24,6 @@ export class UserController {
   //checked
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
-    if(userDto.walletMember) {
-      // Move after this will be a real stripe account.
-      // userDto.stripeCardId = await stripeData.creatPrepaidCreditCard(userDto);
-      userDto.stripeCardId = 'tok_mastercard_prepaid';
-    }
 
     const user = await this._userService.insertUser(userDto);
     return user;
