@@ -53,7 +53,7 @@ export class FinancialService {
 
     const newCreditCard : any = await this._creditCardModel.findOne({ 'walletMemberId': walletMemberId }).exec();
 
-    return newCreditCard && newCreditCard._doc;
+    return newCreditCard;
   }
 
   async findTransactionByRequestId(requestId: string) {
@@ -69,7 +69,7 @@ export class FinancialService {
     let walletMember: User = await this._userService.getUserByEmail(walletMemberEmail);
     const walletMemberId = walletMember._id.toString();
 
-    const creditCard = await this.findCreditCardByWalletMemberId(walletMemberId);
+    const creditCard = (await this.findCreditCardByWalletMemberId(walletMemberId))._doc;
 
     const requestId = request._id.toString();
 
