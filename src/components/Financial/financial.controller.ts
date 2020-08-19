@@ -27,6 +27,7 @@ export class FinancialController {
                 @Body('cvc') cvc: string) {
     const user = await this._userService.getUserById(userId);
     const dateParts = valid.toString().split("/");
+    cardNumber = cardNumber.replace(/\s+/g, '');
 
     const validDate = new Date(Number('20' + dateParts[1]), +dateParts[0], 1);
 

@@ -83,7 +83,7 @@ export class UserService {
       }
       if (walletMemberDto.walletMember) {
         updateUser.walletMember = walletMemberDto.walletMember;
-        if (!updateUser.walletMember) {
+        if (!updateUser.stripeCardId) {
           // Move after this will be a real stripe account.
           //walletMemberDto.stripeCardId = await stripeData.creatPrepaidCreditCard(updateUser);
           walletMemberDto.stripeCardId = 'tok_mastercard_prepaid';
