@@ -1,10 +1,12 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { FinancialService } from './financial.service';
 import { UserService } from '../Users/user.service';
+import { RequestService } from '../Requests/request.service';
+import { User } from '../Users/user.model';
 
 @Controller('financial')
 export class FinancialController {
-  constructor(private financialService: FinancialService, private _userService: UserService) {
+  constructor(private financialService: FinancialService, private _userService: UserService, private _requestService: RequestService) {
   }
   @Get("creditCard/:id")
   async getCreditCard(@Param('id') userId: string) {
@@ -42,5 +44,22 @@ export class FinancialController {
       validDate,
       cvc).then();
     return "success"
+  }
+
+  @Post("transaction")
+  async MakeATransaction(@Body('userId') userId: string,
+                         @Body('requestId') requestId: string) {
+    const user: User = await this._userService.getUserById(userId);
+    const request = await this._requestService.getRequestById(requestId);
+    const transactionId = await this.financialService.insertTransaction(user,
+      request,
+      new Date(),
+    );
+
+    if (transactionId) {
+      await this._requestService.completedRequest(requestId)
+    }
+
+    return transactionId
   }
 }

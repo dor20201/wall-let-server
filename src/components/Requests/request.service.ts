@@ -7,12 +7,11 @@ import { NotificationService } from '../Notification/notification.service';
 import { UserService } from '../Users/user.service';
 import { MailService } from '../Mail/mail.service';
 import { Mail } from '../Mail/mail.model';
-import { FinancialService } from '../Financial/financial.service';
 
 @Injectable()
 export class RequestService {
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
-              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService, private _financialService: FinancialService) {
+              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService) {
   }
 
   async createRequest(requestDto: RequestDto): Promise<string> {
@@ -90,10 +89,10 @@ export class RequestService {
       await this._mailService.sendMail(mail);
 
       // Make transaction
-      await this._financialService.insertTransaction(request.email,
-        request,
-        new Date(),
-      );
+      // await this._financialService.insertTransaction(request.email,
+      //   request,
+      //   new Date(),
+      // );
     }
   }
 
@@ -114,10 +113,10 @@ export class RequestService {
       await this._mailService.sendMail(mail);
 
       // Make transaction
-      await this._financialService.insertTransaction(request.email,
-        request,
-        new Date(),
-      );
+      // await this._financialService.insertTransaction(request.email,
+      //   request,
+      //   new Date(),
+      // );
       return 'Request ' + requestId + 'has been approved';
     }
     return 'User dont have passes';
@@ -193,6 +192,19 @@ export class RequestService {
       throw new NotFoundException(e);
     }
 
+  }
+
+  async completedRequest(requestId) {
+    const request = await this.getRequestById(requestId);
+    request.confirmationStatus = 'completed';
+    request.closedDate = Date.now();
+    await request.save();
+    const mail: Mail = {
+      sendTo: request.email,
+      subject: 'Your request has been completed',
+      content: 'Your request to load your card in ' + request.cost + ' has been approved :) ',
+    };
+    await this._mailService.sendMail(mail);
   }
 }
 

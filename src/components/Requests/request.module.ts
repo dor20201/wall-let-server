@@ -10,7 +10,7 @@ import { MailModule } from '../Mail/mail.module';
 import { FinancialModule } from '../Financial/financial.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{name:'Request',schema: RequestSchema}]), NotificationModule, UserModule,MailModule,FinancialModule],
+  imports: [MongooseModule.forFeature([{name:'Request',schema: RequestSchema}]), NotificationModule, UserModule,MailModule],
   controllers: [RequestController],
   providers: [RequestService],
   exports:[RequestService]

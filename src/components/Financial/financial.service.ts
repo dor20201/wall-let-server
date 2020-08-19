@@ -64,9 +64,8 @@ export class FinancialService {
     return transaction && transaction._doc;
   }
 
-  async insertTransaction(walletMemberEmail: string, request: Request, date: Date) {
+  async insertTransaction(walletMember: User, request: Request, date: Date) {
 
-    let walletMember: User = await this._userService.getUserByEmail(walletMemberEmail);
     const walletMemberId = walletMember._id.toString();
 
     const creditCard = (await this.findCreditCardByWalletMemberId(walletMemberId))._doc;
@@ -77,7 +76,7 @@ export class FinancialService {
     if ((await this.findTransactionByRequestId(requestId)) ||
       !request ||
       request.confirmationStatus !== "approved" || !walletMember ||
-      walletMemberEmail !== request.email || !creditCard) {
+      walletMember.email !== request.email || !creditCard) {
       return null;
     }
 

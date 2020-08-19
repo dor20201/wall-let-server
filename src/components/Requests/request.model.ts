@@ -28,6 +28,6 @@ export interface Request extends mongoose.Document {
   additionalDescription: string;
   pic: string;
   friendsConfirmation: [{string,boolean}];
-  confirmationStatus: string;// open ,approved, inProcess;
+  confirmationStatus: string;// open ,approved, inProcess, completed;
   botScore:number
 }
