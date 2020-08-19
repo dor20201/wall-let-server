@@ -17,8 +17,13 @@ export class FinancialController {
       return "user doesnt exist";
     }
 
+    const card = (await this.financialService.findCreditCardByWalletMemberId(userId));
 
-    return this.financialService.findCreditCardByWalletMemberId(userId);
+    if (card) {
+      const cardNumber = card.creditCardNumber;
+      // Last 3 digits
+      return cardNumber && cardNumber.substr(cardNumber.length -3, 3);
+    }
   }
 
   @Post("creditCard")
@@ -38,11 +43,15 @@ export class FinancialController {
       return "user doesnt exist";
     }
 
-    this.financialService.insertCreditCard(userId,
+    const credit = await this.financialService.insertCreditCard(userId,
       companyName,
       cardNumber,
       validDate,
-      cvc).then();
+      cvc);
+    if(credit) {
+      // Last 3 digits
+      return cardNumber.substr(cardNumber.length - 3, 3);
+    }
     return "success"
   }
 
@@ -51,15 +60,15 @@ export class FinancialController {
                          @Body('requestId') requestId: string) {
     const user: User = await this._userService.getUserById(userId);
     const request = await this._requestService.getRequestById(requestId);
-    const transactionId = await this.financialService.insertTransaction(user,
+    const transaction = await this.financialService.insertTransaction(user,
       request,
       new Date(),
     );
 
-    if (transactionId) {
-      await this._requestService.completedRequest(requestId)
+    if (transaction) {
+      await this._requestService.completedRequest(requestId);
     }
 
-    return transactionId
+    return transaction;
   }
 }
