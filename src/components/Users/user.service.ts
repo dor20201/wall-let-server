@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.model';
 import { Model } from 'mongoose';
 import { UserDto, WalletMemberDto } from './dto/user.dto';
-import { stripeData } from '../Financial/stripeData';
 
 @Injectable()
 export class UserService {
@@ -21,11 +20,6 @@ export class UserService {
     }
   }
 
-  //   // find user by id and then update the other parameters
-  //   // return user
-  // async inertWalletMember(walletMemberDto:WalletMemberDto){
-  //
-  // }
 
   async getUserById(userId: string): Promise<User> {
     let user;
@@ -77,7 +71,6 @@ export class UserService {
   async updateUser(walletMemberDto: WalletMemberDto): Promise<User> {
     try {
       const updateUser = await this._userModel.findById(walletMemberDto.id).exec();
-
       if (walletMemberDto.maritalStatus) {
         updateUser.maritalStatus = walletMemberDto.maritalStatus;
       }
@@ -114,17 +107,18 @@ export class UserService {
     }
   }
 
-  async addWalletMember(userId:string,friendEmail:string){
+  async addWalletFriend(userId:string,friendEmail:string){
+    let friendUser;
     try {
-      await this.getUserByEmail(friendEmail);
+     friendUser =  await this.getUserByEmail(friendEmail);
     }catch (e) {
       throw new NotFoundException('The Friend user were not found');
 
     }
-     const user:User = await this.getUserById(userId);
+     const user:User = await this._userModel.findById(userId).exec();
      user.myWalletMembers.push(friendEmail);
      await user.save();
-     return user;
+     return friendUser.email;
   }
 
   async getUsersByEmails(emails: string[]): Promise<any> {

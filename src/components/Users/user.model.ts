@@ -11,18 +11,17 @@ export const UserSchema = new mongoose.Schema({
   maritalStatus: { type: Number, default:null },
   addictedStatus: { type: Number, default:null },
   myTarget: { type: Number, default:null },
-  walletMember: { type: Boolean, default:null },
-  friendMember: { type: Boolean, default:null},
+  walletMember: { type: Boolean, default:false },
+  friendMember: { type: Boolean, default:true},
   myWalletMembers: { type: [String], default:null },
-  myFixedExpenses: { type: [{ name: String, expense: Number }],default:null },
-  myFixedIncomes: { type: [{ name: String, income: Number }],default:null },
+  myFixedExpenses: { type: [{ name: String, value: Number }],default:null },
+  myFixedIncomes: { type: [{ name: String, value: Number }],default:null },
   passes: { type: Number,  default:5},
   creditCardId: {type: String, default:null},
   stripeCardId: {type: String, default:null}
 });
 
 export interface User extends mongoose.Document {
-  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -36,8 +35,8 @@ export interface User extends mongoose.Document {
   walletMember: boolean;
   friendMember: boolean;
   myWalletMembers: string[]; // array of emails
-  myFixedExpenses: [{ name: string, expense: number }];
-  myFixedIncomes: [{ name: string, income: number }];
+  myFixedExpenses: [{ name: string, value: number }];
+  myFixedIncomes: [{ name: string, value: number }];
   passes: number;
   creditCardId: string;
   stripeCardId: string;

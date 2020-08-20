@@ -10,21 +10,25 @@ export class UserController {
 
   //checked
   @Get(':id')
-  getUser(@Param('id') userId: string) {
-    return this._userService.getUserById(userId);
+  async getUser(@Param('id') userId: string):Promise<User> {
+    return await this._userService.getUserById(userId);
+  }
+
+  @Post('byEmail')
+ async getUserByEmail(@Param('email') email: string):Promise<User> {
+    return await this._userService.getUserByEmail(email);
   }
 
   //checked
   @Post('logIn')
-  logIn(@Body('email') userEmail: string,
-         @Body('password') userPassword: string) {
-    return this._userService.getUserByPassword(userEmail, userPassword);
+  async logIn(@Body('email') userEmail: string,
+         @Body('password') userPassword: string):Promise<User> {
+    return await this._userService.getUserByPassword(userEmail, userPassword);
   }
 
   //checked
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
-
     const user = await this._userService.insertUser(userDto);
     return user;
   };
@@ -48,9 +52,9 @@ export class UserController {
   };
 
   // add friend member to my walletMember list
-  @Post('addWalletMember')
-  async addWalletMember(@Body('userId') userId:string,@Body('friendEmail')friendEmail: string): Promise<User> {
-    return  await this._userService.addWalletMember(userId,friendEmail);
+  @Post('addWalletFriend')
+  async addWalletFriend(@Body('userId') userId:string,@Body('friendEmail')friendEmail: string): Promise<User> {
+    return  await this._userService.addWalletFriend(userId,friendEmail);
   };
 
   @Post()
