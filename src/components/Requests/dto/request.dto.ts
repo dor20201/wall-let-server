@@ -10,7 +10,7 @@ export class RequestDto {
   additionalDescription: string;
   pic: string;
   friendsConfirmation: [{ email: string, confirm: boolean }];
-  confirmationStatus: string; //approved,unApproved,open
+  confirmationStatus: boolean;
   botScore: number;
   subCategory: string;
   transaction:boolean;
