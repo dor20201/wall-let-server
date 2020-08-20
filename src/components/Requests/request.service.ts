@@ -31,27 +31,29 @@ export class RequestService {
     return this._requestModel.find({});
   }
 
-  getRequests(userType: string, confirmationStatus: string, Email: string): Promise<Request[]> {
 
+  getAllRequestsByUserType(userType: string, Email: string): Promise<Request[]> {
     if (userType == 'friendMember') {
-      if (confirmationStatus == 'All') {
-        return this._requestModel.find({ 'friendsConfirmation.email': Email }).exec();
-      } else if (confirmationStatus == 'open') {
-        return this._requestModel.find({
-          'friendsConfirmation.email': Email,
-          'confirmationStatus': confirmationStatus,
-        }).exec();
-
-      }
+      return this._requestModel.find({ 'friendsConfirmation.email': Email }).exec();
     } else if (userType == 'walletMember') {
-      if (confirmationStatus == 'All') {
-        return this._requestModel.find({ 'email': Email }).exec();
-      } else {
-        return this._requestModel.find({ 'email': Email, 'confirmationStatus': confirmationStatus }).exec();
-
-      }
+      return this._requestModel.find({ 'email': Email }).exec();
     }
   }
+
+
+  getRequestsByStatus(userType: string, confirmationStatus: boolean, Email: string): Promise<Request[]> {
+    if (userType == 'friendMember') {
+      return this._requestModel.find({
+        'friendsConfirmation.email': Email,
+        'confirmationStatus': confirmationStatus,
+      }).exec();
+
+    } else if (userType == 'walletMember') {
+      return this._requestModel.find({ 'email': Email, 'confirmationStatus': confirmationStatus }).exec();
+
+    }
+  }
+
 
   async getRequestById(id: string): Promise<Request> {
     return this._requestModel.findOne({ '_id': id }).exec();
@@ -76,7 +78,7 @@ export class RequestService {
     const totalFriends: number = request.friendsConfirmation.length;
     const approvedNum: number = request.friendsConfirmation.map(o => o[1] == true).length;
     if (totalFriends < 2 * approvedNum) {
-      request.confirmationStatus = 'approved';
+      request.confirmationStatus = true;
       request.closedDate = Date.now();
       await request.save();
 
@@ -94,7 +96,7 @@ export class RequestService {
     const request = await this.getRequestById(requestId);
     const user = await this._userService.getUserById(userId);
     if (user.passes > 0) {
-      request.confirmationStatus = 'approved';
+      request.confirmationStatus = true;
       request.closedDate = Date.now();
       await request.save();
       user.passes = user.passes - 1;
@@ -113,7 +115,7 @@ export class RequestService {
 
   async approveByML(requestId): Promise<string> {
     const request = await this.getRequestById(requestId);
-    request.confirmationStatus = 'approved';
+    request.confirmationStatus = true;
     request.closedDate = Date.now();
     await request.save();
     const mail: Mail = {
@@ -134,7 +136,7 @@ export class RequestService {
   }
 
   async moneySavedSinceEver(email: string): Promise<number> {
-    const requests: Request[] = await this._requestModel.find({ 'email': email, 'confirmationStatus': 'unApproved' });
+    const requests: Request[] = await this._requestModel.find({ 'email': email, 'confirmationStatus': false });
     return requests.map(r => r.cost).reduce(function(a: number, b: number) {
       return a + b;
     });
@@ -159,7 +161,7 @@ export class RequestService {
 
   }
 
-  async requestsByStatus(email: string, status: string): Promise<Request[]> {
+  async requestsByStatus(email: string, status: boolean): Promise<Request[]> {
     return this._requestModel.find({ 'email': email, 'confirmationStatus': status });
   }
 
@@ -169,7 +171,7 @@ export class RequestService {
     const year = d.getFullYear();
     const requests: Request[] = await this._requestModel.find({
       'email': email,
-      'confirmationStatus': 'approved',
+      'confirmationStatus': true,
       'openedDate': { $lt: new Date(), $gt: new Date(year + ',' + month) },
     });
 
@@ -185,7 +187,7 @@ export class RequestService {
 
   async completedRequest(requestId) {
     const request = await this.getRequestById(requestId);
-    request.confirmationStatus = 'completed';
+    request.confirmationStatus = true;
     request.closedDate = Date.now();
     await request.save();
     const mail: Mail = {

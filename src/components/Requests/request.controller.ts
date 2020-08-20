@@ -12,7 +12,7 @@ export class RequestController {
   @Post('all')
   async getAllRequests(@Body('userType') userType: string,
                        @Body('email') email: string): Promise<Request[]> {
-    return await this._requestModel.getRequests(userType, 'All', email);
+    return await this._requestModel.getAllRequestsByUserType(userType,email);
   }
 
 
@@ -27,18 +27,12 @@ export class RequestController {
     return this._requestModel.requestsByCategory(email,category);
   }
 
-  @Post('getRequestByStatus')
-  async getRequestsByStatus(@Body('email') email: string,
-                            @Body('status') status: string): Promise<Request[]> {
-    return this._requestModel.requestsByStatus(email, status);
-  }
-
-  // Get request by userType (walletMember, FriendMember) & confirmationStatus (open,approved,inProcess) & email
+  // Get request by userType (walletMember, FriendMember) & confirmationStatus (true,false) & email
   @Post('getRequestByConfirmationStatus')
-  async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: string,
+  async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: boolean,
                                        @Body('userType') userType: string,
                                        @Body('email') email: string): Promise<Request[]> {
-    return await this._requestModel.getRequests(userType, confirmationStatus, email);
+    return await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
   }
 
   @Get(':id')
@@ -64,13 +58,13 @@ export class RequestController {
   // it checks if the user have passes and if he have i am down the passes by 1 and change the confirmationStatus to Approve
   @Post('approveByPasses')
   async ApproveByPasses(@Body('userId') userId: string,
-                        @Body('RequestId') requestId: string): Promise<string> {
+                        @Body('requestId') requestId: string): Promise<string> {
 
     return this._requestModel.approveByPass(userId, requestId);
   }
 
   @Post('approveByML')
-  async ApproveByML(@Body('RequestId') requestId: string): Promise<string> {
+  async ApproveByML(@Body('requestId') requestId: string): Promise<string> {
     return this._requestModel.approveByML(requestId);
   }
 

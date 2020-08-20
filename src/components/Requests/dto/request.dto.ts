@@ -12,4 +12,6 @@ export class RequestDto {
   friendsConfirmation: [{ email: string, confirm: boolean }];
   confirmationStatus: string; //approved,unApproved,open
   botScore: number;
+  subCategory: string;
+
 }

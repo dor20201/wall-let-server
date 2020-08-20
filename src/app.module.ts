@@ -11,12 +11,13 @@ import { QuestionModule } from './components/Question/question.module';
 import { StatisticsModule } from './components/Statistics/statistics.module';
 import { FinancialModule } from './components/Financial/financial.module';
 import { BotModule } from './components/Bot/bot.module';
+import { CategoryModule } from './components/category/category.module';
 
 
 @Module({
   imports: [MongooseModule.forRoot(
-    'mongodb+srv://admin:admin@walllet-oykbx.mongodb.net/test?retryWrites=true&w=majority'
-  ),UserModule,BusinessModule,RequestModule, NotificationService,MailModule,QuestionModule,StatisticsModule, FinancialModule, BotModule],
+    'mongodb+srv://admin:admin@walllet.oykbx.mongodb.net/walletDB?retryWrites=true&w=majority'
+  ),UserModule,BusinessModule,RequestModule, NotificationService,MailModule,QuestionModule,StatisticsModule, FinancialModule, BotModule,CategoryModule],
   controllers: [AppController],
   providers: [AppService]
 })
