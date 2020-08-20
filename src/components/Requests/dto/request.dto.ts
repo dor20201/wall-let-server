@@ -13,5 +13,6 @@ export class RequestDto {
   confirmationStatus: string; //approved,unApproved,open
   botScore: number;
   subCategory: string;
+  transaction:boolean;
 
 }
