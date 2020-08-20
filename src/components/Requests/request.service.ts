@@ -187,7 +187,7 @@ export class RequestService {
 
   async completedRequest(requestId) {
     const request = await this.getRequestById(requestId);
-    request.confirmationStatus = true;
+    request.transaction = true;
     request.closedDate = Date.now();
     await request.save();
     const mail: Mail = {
