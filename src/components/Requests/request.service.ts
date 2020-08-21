@@ -32,23 +32,24 @@ export class RequestService {
   }
 
 
-  getAllRequestsByUserType(userType: string, Email: string): Promise<Request[]> {
-    if (userType == 'friendMember') {
+  getAllRequestsByUserType(userType: number, Email: string): Promise<Request[]> {
+    if (userType == 1) {
       return this._requestModel.find({ 'friendsConfirmation.email': Email }).exec();
-    } else if (userType == 'walletMember') {
+    } else if (userType == 0) {
       return this._requestModel.find({ 'email': Email }).exec();
     }
   }
 
 
-  getRequestsByStatus(userType: string, confirmationStatus: boolean, Email: string): Promise<Request[]> {
-    if (userType == 'friendMember') {
+  getRequestsByStatus(userType: number, confirmationStatus: boolean, Email: string): Promise<Request[]> {
+    //friendMember
+    if (userType == 1) {
       return this._requestModel.find({
         'friendsConfirmation.email': Email,
         'confirmationStatus': confirmationStatus,
       }).exec();
-
-    } else if (userType == 'walletMember') {
+//'walletMember'
+    } else if (userType == 0) {
       return this._requestModel.find({ 'email': Email, 'confirmationStatus': confirmationStatus }).exec();
 
     }

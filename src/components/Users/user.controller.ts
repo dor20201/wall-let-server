@@ -53,7 +53,8 @@ export class UserController {
 
   // add friend member to my walletMember list
   @Post('addWalletFriend')
-  async addWalletFriend(@Body('userId') userId:string,@Body('friendEmail')friendEmail: string): Promise<User> {
+  async addWalletFriend(@Body('userId') userId:string,
+                        @Body('friendEmail')friendEmail: string): Promise<User> {
     return  await this._userService.addWalletFriend(userId,friendEmail);
   };
 

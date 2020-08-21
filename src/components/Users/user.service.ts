@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserSchema } from './user.model';
+import { User } from './user.model';
 import { Model } from 'mongoose';
 import { UserDto, WalletMemberDto } from './dto/user.dto';
 
@@ -10,16 +10,14 @@ export class UserService {
   constructor(@InjectModel('User') private readonly _userModel: Model<User>) {
   }
 
-  async insertUser(userDto: UserDto):Promise<User> {
+  async insertUser(userDto: UserDto): Promise<User> {
     try {
       const newUser = new this._userModel(userDto);
-      const result = await newUser.save();
-      return result;
+      return await newUser.save();
     } catch (e) {
       throw new NotFoundException('The Users were not insert correctly ');
     }
   }
-
 
   async getUserById(userId: string): Promise<User> {
     let user;
@@ -31,13 +29,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('could not find user');
     }
-
     return user._doc;
-  }
-
-  async getUsers() {
-    const users = await this._userModel.find().exec();
-    return users;
   }
 
   async getUserByPassword(userEmail: string, userPassword: string): Promise<User> {
@@ -51,21 +43,18 @@ export class UserService {
   async isPasswordAnswerCorrect(email: string, answer: string) {
     let user;
     try {
-      user = await this._userModel.findOne({email:email}).exec();
-      if (user.answerPassword == answer) {
-        return true;
-      }
-      return false;
+      user = await this._userModel.findOne({ email: email }).exec();
+      return user.answerPassword == answer;
     } catch (e) {
       throw new NotFoundException('could not find user');
     }
   }
 
-  async updatePassword(email: string, newPassword: string){
-    const user:User = await this._userModel.findOne({email:email}).exec();
+  async updatePassword(email: string, newPassword: string) {
+    const user: User = await this._userModel.findOne({ email: email }).exec();
     user.password = newPassword;
     await user.save();
-    return "Password updated successfully"
+    return 'Password updated successfully';
   }
 
   async updateUser(walletMemberDto: WalletMemberDto): Promise<User> {
@@ -107,18 +96,23 @@ export class UserService {
     }
   }
 
-  async addWalletFriend(userId:string,friendEmail:string){
-    let friendUser;
+  async addWalletFriend(userId: string, friendEmail: string) {
     try {
-     friendUser =  await this.getUserByEmail(friendEmail);
-    }catch (e) {
+       await this.getUserByEmail(friendEmail);
+    } catch (e) {
       throw new NotFoundException('The Friend user were not found');
 
     }
-     const user:User = await this._userModel.findById(userId).exec();
-     user.myWalletMembers.push(friendEmail);
-     await user.save();
-     return friendUser.email;
+    const user: User = await this._userModel.findById(userId).exec();
+    for(let i = 0; i< user.myWalletMembers.length; i++){
+      if(user.myWalletMembers[i] = friendEmail){
+        throw new NotFoundException('The friend you are trying to add is already in the WalletMember');
+      }
+    }
+
+    user.myWalletMembers.push(friendEmail);
+    await user.save();
+    return user;
   }
 
   async getUsersByEmails(emails: string[]): Promise<any> {
@@ -131,9 +125,8 @@ export class UserService {
 
   async getUserByEmail(email: string): Promise<User> {
     try {
-      const user = await this._userModel.findOne({ 'email': email });
-      return user;
-    }catch (e) {
+      return await this._userModel.findOne({ 'email': email });
+    } catch (e) {
       throw new NotFoundException('The User were not found');
     }
   }

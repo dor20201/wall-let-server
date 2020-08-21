@@ -10,7 +10,7 @@ export class RequestController {
 
   // Get request by userType (walletMember, friendMember)
   @Post('all')
-  async getAllRequests(@Body('userType') userType: string,
+  async getAllRequests(@Body('userType') userType: number,
                        @Body('email') email: string): Promise<Request[]> {
     return await this._requestModel.getAllRequestsByUserType(userType,email);
   }
@@ -27,10 +27,10 @@ export class RequestController {
     return this._requestModel.requestsByCategory(email,category);
   }
 
-  // Get request by userType (walletMember, FriendMember) & confirmationStatus (true,false) & email
+  // Get request by userType (walletMember=0, FriendMember=1) & confirmationStatus (true,false) & email
   @Post('getRequestByConfirmationStatus')
   async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: boolean,
-                                       @Body('userType') userType: string,
+                                       @Body('userType') userType: number,
                                        @Body('email') email: string): Promise<Request[]> {
     return await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
   }
