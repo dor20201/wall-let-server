@@ -7,6 +7,8 @@ import { NotificationService } from '../Notification/notification.service';
 import { UserService } from '../Users/user.service';
 import { MailService } from '../Mail/mail.service';
 import { Mail } from '../Mail/mail.model';
+import { WalletMemberDto } from '../Users/dto/user.dto';
+import { User } from '../Users/user.model';
 
 @Injectable()
 export class RequestService {
@@ -197,6 +199,43 @@ export class RequestService {
       content: 'Your request to load your card in ' + request.cost + ' has been approved :) ',
     };
     await this._mailService.sendMail(mail);
+  }
+
+  async updateRequest(requestDto: RequestDto): Promise<Request> {
+    try {
+      const updateRequest = await this._requestModel.findById(requestDto.id).exec();
+      if (requestDto.category) {
+        updateRequest.category = requestDto.category;
+      }
+      if (requestDto.cost) {
+        updateRequest.cost = requestDto.cost;
+      }
+      if (requestDto.description) {
+        updateRequest.description = requestDto.description;
+      }
+      if (requestDto.necessity) {
+        updateRequest.necessity = requestDto.necessity;
+      }
+      if (requestDto.additionalDescription) {
+        updateRequest.additionalDescription = requestDto.additionalDescription;
+      }
+      if (requestDto.subCategory) {
+        updateRequest.subCategory = requestDto.subCategory;
+      }
+      await updateRequest.save();
+      return updateRequest;
+    } catch (e) {
+      throw new NotFoundException('The Request were not update');
+    }
+  }
+
+  async deleteRequest(id: string) {
+    try {
+      await this._requestModel.deleteOne({ _id: id });
+      return 'the Request has deleted';
+    }catch (e){
+      throw new NotFoundException('the Request has not deleted')
+    }
   }
 }
 

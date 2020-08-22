@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { RequestDto } from './dto/request.dto';
 import { Request } from './request.model';
@@ -66,6 +66,17 @@ export class RequestController {
   @Post('approveByML')
   async ApproveByML(@Body('requestId') requestId: string): Promise<string> {
     return this._requestModel.approveByML(requestId);
+  }
+
+  @Post('updateRequest')
+  async UpdateRequest(@Body('requestDto') requestDto:RequestDto):Promise<Request>{
+    return await this._requestModel.updateRequest(requestDto);
+  }
+
+  @Delete(':id')
+  async DeleteRequest(@Param(':id') id:string):Promise<string>
+  {
+    return this._requestModel.deleteRequest(id);
   }
 
 }
