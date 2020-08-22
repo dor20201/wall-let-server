@@ -113,7 +113,10 @@ export class UserService {
 
   async addWalletFriend(userId: string, friendEmail: string) {
     try {
+      if(friendEmail == ""){
+        throw new NotFoundException('The email is empty');
 
+      }
       const available = await this.checkIfEmailIsAvailable(friendEmail);
       if (!available) {
         const user: User = await this._userModel.findById(userId).then();

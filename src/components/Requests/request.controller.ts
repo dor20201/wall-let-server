@@ -30,10 +30,11 @@ export class RequestController {
 
   // Get request by userType (walletMember=0, FriendMember=1) & confirmationStatus (true,false) & email
   @Post('getRequestByConfirmationStatus')
-  async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: boolean,
+  async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: number,
                                        @Body('userType') userType: number,
                                        @Body('email') email: string): Promise<Request[]> {
-    return await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
+   return await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
+
   }
 
   @Get(':id')
@@ -87,9 +88,14 @@ export class RequestController {
     return await this._requestModel.updateRequest(requestDto);
   }
 
-  @Delete(':id')
-  async DeleteRequest(@Param(':id') id: string): Promise<string> {
+  @Post('deleteRequest')
+  async DeleteRequest(@Body('id') id: string): Promise<string> {
     return this._requestModel.deleteRequest(id);
+  }
+
+  @Post('remindFriend')
+ async remindFriend(@Body('requestId') requestId: string):Promise<string> {
+     return await this._requestModel.remindFriends(requestId);
   }
 
 }
