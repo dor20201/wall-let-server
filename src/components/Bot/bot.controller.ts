@@ -22,7 +22,7 @@ export class BotController {
   async getAllRequests123()  {
     const request= await this._requestService.getAllRequests();
     return request;
-  }
+  };
 
   @Post('requestId&score')
   async insertScore(@Param('requestId') requestId: string, @Param('score') score: number): Promise<string> {

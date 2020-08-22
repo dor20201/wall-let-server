@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpService, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from './request.model';
 import { Model } from 'mongoose';
@@ -8,19 +8,22 @@ import { UserService } from '../Users/user.service';
 import { MailService } from '../Mail/mail.service';
 import { Mail } from '../Mail/mail.model';
 
+
 @Injectable()
 export class RequestService {
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
-              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService) {
+              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService, private httpService: HttpService) {
+
   }
 
-  async createRequest(requestDto: RequestDto): Promise<string> {
+  async createRequest(requestDto: RequestDto): Promise<Request> {
     try {
+      await this._userService.updatePasses(requestDto.email);
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
-      return result._id;
+      return result;
     } catch (e) {
       throw new NotFoundException('could not create Request');
 
@@ -32,23 +35,24 @@ export class RequestService {
   }
 
 
-  getAllRequestsByUserType(userType: string, Email: string): Promise<Request[]> {
-    if (userType == 'friendMember') {
+  getAllRequestsByUserType(userType: number, Email: string): Promise<Request[]> {
+    if (userType == 1) {
       return this._requestModel.find({ 'friendsConfirmation.email': Email }).exec();
-    } else if (userType == 'walletMember') {
+    } else if (userType == 0) {
       return this._requestModel.find({ 'email': Email }).exec();
     }
   }
 
 
-  getRequestsByStatus(userType: string, confirmationStatus: boolean, Email: string): Promise<Request[]> {
-    if (userType == 'friendMember') {
+  getRequestsByStatus(userType: number, confirmationStatus: boolean, Email: string): Promise<Request[]> {
+    //friendMember
+    if (userType == 1) {
       return this._requestModel.find({
         'friendsConfirmation.email': Email,
         'confirmationStatus': confirmationStatus,
       }).exec();
-
-    } else if (userType == 'walletMember') {
+//'walletMember'
+    } else if (userType == 0) {
       return this._requestModel.find({ 'email': Email, 'confirmationStatus': confirmationStatus }).exec();
 
     }
@@ -59,14 +63,23 @@ export class RequestService {
     return this._requestModel.findOne({ '_id': id }).exec();
   }
 
-  async reactToRequest(id: string, email: string, answer: string) {
+  async reactToRequest(id: string, email: string, confirmationStatus: boolean) {
+    const mlServer = 'http://e521a900b171.ngrok.io/req';
     let request;
     try {
       request = await this.getRequestById(id);
-
-      request.friendsConfirmation.map(o => o.email == email).reduce(o => o.confirm = answer);
+    //  request.friendsConfirmation.map(o => o.email == email).reduce(o => o.confirm = confirmationStatus);
+      for(let i =0;i<request.friendsConfirmation.length;i++){
+        if(request.friendsConfirmation[i].email == email ){
+          request.friendsConfirmation[i].confirm = confirmationStatus;
+        }
+      }
       request.save();
-      await this.isRequestApprove(id);
+      this.httpService.post(mlServer, {
+        'req_id': request.id,
+        'email': request.email,
+        'botScore': request.botScore,
+      });
       return 'Answer received ';
     } catch (e) {
       throw new NotFoundException('could not find Request');
@@ -79,7 +92,6 @@ export class RequestService {
     const approvedNum: number = request.friendsConfirmation.map(o => o[1] == true).length;
     if (totalFriends < 2 * approvedNum) {
       request.confirmationStatus = true;
-      request.closedDate = Date.now();
       await request.save();
 
       const mail: Mail = {
@@ -116,7 +128,6 @@ export class RequestService {
   async approveByML(requestId): Promise<string> {
     const request = await this.getRequestById(requestId);
     request.confirmationStatus = true;
-    request.closedDate = Date.now();
     await request.save();
     const mail: Mail = {
       sendTo: request.email,
@@ -126,7 +137,6 @@ export class RequestService {
     await this._mailService.sendMail(mail);
     return 'Request ' + requestId + 'has been approved';
   }
-
 
   async insertScore(requestId: string, score: number): Promise<string> {
     const request = await this.getRequestById(requestId);
@@ -187,7 +197,6 @@ export class RequestService {
 
   async completedRequest(requestId) {
     const request = await this.getRequestById(requestId);
-    request.transaction = true;
     request.closedDate = Date.now();
     await request.save();
     const mail: Mail = {
@@ -197,6 +206,81 @@ export class RequestService {
     };
     await this._mailService.sendMail(mail);
   }
+
+  async updateRequest(requestDto: RequestDto): Promise<Request> {
+    try {
+      const updateRequest = await this._requestModel.findById(requestDto.id).exec();
+      if (requestDto.category) {
+        updateRequest.category = requestDto.category;
+      }
+      if (requestDto.cost) {
+        updateRequest.cost = requestDto.cost;
+      }
+      if (requestDto.description) {
+        updateRequest.description = requestDto.description;
+      }
+      if (requestDto.necessity) {
+        updateRequest.necessity = requestDto.necessity;
+      }
+      if (requestDto.additionalDescription) {
+        updateRequest.additionalDescription = requestDto.additionalDescription;
+      }
+      if (requestDto.subCategory) {
+        updateRequest.subCategory = requestDto.subCategory;
+      }
+      await updateRequest.save();
+      return updateRequest;
+    } catch (e) {
+      throw new NotFoundException('The Request were not update');
+    }
+  }
+
+  async deleteRequest(id: string) {
+    try {
+      await this._requestModel.deleteOne({ _id: id });
+      return 'the Request has deleted';
+    } catch (e) {
+      throw new NotFoundException('the Request has not deleted');
+    }
+  }
+
+  async getRequestByOpenDate(userType: number, email: string, openDate: number): Promise<Request[]> {
+
+    if (userType == 0) {
+      return await this._requestModel.find({ 'openDate': openDate, 'email': email }).exec();
+
+    } else if (userType == 1) {
+
+      return await this._requestModel.find({
+        'openDate': openDate,
+        'friendsConfirmation.email': { $contains: email },
+      }).exec();
+    }
+  }
+
+  async getRequestByClosedDate(userType: number, email: string, closedDate: number): Promise<Request[]> {
+
+    if (userType == 0) {
+      return await this._requestModel.find({ 'closedDate': closedDate, 'email': email }).exec();
+
+    } else if (userType == 1) {
+
+      return await this._requestModel.find({
+        'closedDate': closedDate,
+        'friendsConfirmation.email': { $contains: email },
+      }).exec();
+    }
+  }
+
+  async remindFriends(requestId: string) {
+    const request = await this.getRequestById(requestId);
+
+    const emails = request.friendsConfirmation.map(o => o.email);
+
+    await this._mailService.sendMails(emails, 'reminder to approve request', 'we remind you to response to ' + request.email + ' request');
+  }
+
+
 }
 
 

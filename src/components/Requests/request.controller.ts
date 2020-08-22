@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { RequestDto } from './dto/request.dto';
 import { Request } from './request.model';
+import { BotService } from '../Bot/bot.service';
 
 @Controller('request')
 export class RequestController {
@@ -10,9 +11,9 @@ export class RequestController {
 
   // Get request by userType (walletMember, friendMember)
   @Post('all')
-  async getAllRequests(@Body('userType') userType: string,
+  async getAllRequests(@Body('userType') userType: number,
                        @Body('email') email: string): Promise<Request[]> {
-    return await this._requestModel.getAllRequestsByUserType(userType,email);
+    return await this._requestModel.getAllRequestsByUserType(userType, email);
   }
 
 
@@ -24,13 +25,13 @@ export class RequestController {
   @Post('getRequestByCategory')
   async getRequestsByCategory(@Body('email') email: string,
                               @Body('category') category: string): Promise<Request[]> {
-    return this._requestModel.requestsByCategory(email,category);
+    return this._requestModel.requestsByCategory(email, category);
   }
 
-  // Get request by userType (walletMember, FriendMember) & confirmationStatus (true,false) & email
+  // Get request by userType (walletMember=0, FriendMember=1) & confirmationStatus (true,false) & email
   @Post('getRequestByConfirmationStatus')
   async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: boolean,
-                                       @Body('userType') userType: string,
+                                       @Body('userType') userType: number,
                                        @Body('email') email: string): Promise<Request[]> {
     return await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
   }
@@ -40,9 +41,22 @@ export class RequestController {
     return await this._requestModel.getRequestById(id);
   }
 
+  @Get('getRequestByOpenDate')
+  async getRequestByOpenDate(@Body('userType') userType: number,
+                             @Body('email') email: string,
+                             @Body('openDate') openDate: number): Promise<Request[]> {
+    return await this._requestModel.getRequestByOpenDate(userType, email, openDate);
+  }
+
+  @Get('getRequestByClosedDate')
+  async getRequestByClosedDate(@Body('userType') userType: number,
+                               @Body('email') email: string,
+                               @Body('closedDate') closedDate: number): Promise<Request[]> {
+    return await this._requestModel.getRequestByClosedDate(userType, email, closedDate);
+  }
 
   @Patch()
-  async createRequest(@Body('request') requestDto: RequestDto): Promise<string> {
+  async createRequest(@Body('request') requestDto: RequestDto): Promise<Request> {
     return this._requestModel.createRequest(requestDto);
   }
 
@@ -50,8 +64,8 @@ export class RequestController {
   @Post('ReactToRequest')
   async ReactToRequest(@Body('id') id: string,
                        @Body('email') email: string,
-                       @Body('answer') answer: string): Promise<string> {
-    return await this._requestModel.reactToRequest(id, email, answer);
+                       @Body('confirmationStatus') confirmationStatus: boolean): Promise<string> {
+    return await this._requestModel.reactToRequest(id, email, confirmationStatus);
   }
 
   // approve request by the passes,
@@ -66,6 +80,16 @@ export class RequestController {
   @Post('approveByML')
   async ApproveByML(@Body('requestId') requestId: string): Promise<string> {
     return this._requestModel.approveByML(requestId);
+  }
+
+  @Post('updateRequest')
+  async UpdateRequest(@Body('requestDto') requestDto: RequestDto): Promise<Request> {
+    return await this._requestModel.updateRequest(requestDto);
+  }
+
+  @Delete(':id')
+  async DeleteRequest(@Param(':id') id: string): Promise<string> {
+    return this._requestModel.deleteRequest(id);
   }
 
 }
