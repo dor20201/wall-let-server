@@ -62,4 +62,8 @@ export class UserController {
   getUsersByEmails(@Body('emails') emails:[string]){
     return this._userService.getUsersByEmails(emails);
   }
+
+
+
+
 }

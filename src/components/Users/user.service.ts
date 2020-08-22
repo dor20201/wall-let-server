@@ -98,14 +98,14 @@ export class UserService {
 
   async addWalletFriend(userId: string, friendEmail: string) {
     try {
-       await this.getUserByEmail(friendEmail);
+      await this.getUserByEmail(friendEmail);
     } catch (e) {
       throw new NotFoundException('The Friend user were not found');
 
     }
     const user: User = await this._userModel.findById(userId).exec();
-    for(let i = 0; i< user.myWalletMembers.length; i++){
-      if(user.myWalletMembers[i] = friendEmail){
+    for (let i = 0; i < user.myWalletMembers.length; i++) {
+      if (user.myWalletMembers[i] = friendEmail) {
         throw new NotFoundException('The friend you are trying to add is already in the WalletMember');
       }
     }
@@ -128,6 +128,16 @@ export class UserService {
       return await this._userModel.findOne({ 'email': email });
     } catch (e) {
       throw new NotFoundException('The User were not found');
+    }
+  }
+
+  async updatePasses(email: string) {
+    const user = await this.getUserByEmail(email);
+    const currentMonth = new Date(Date.now()).getMonth() + 1;
+    if (user.updatePassedMonth != currentMonth) {
+      user.passes = user.addictedStatus;
+      user.updatePassedMonth = currentMonth;
+      await user.save();
     }
   }
 }

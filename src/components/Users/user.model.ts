@@ -8,17 +8,18 @@ export const UserSchema = new mongoose.Schema({
   answerPassword: { type: String, required: true },
   phoneNumber: { type: String, required: true },
   yearOfBirth: { type: Number, required: true },
-  maritalStatus: { type: Number, default:null },
-  addictedStatus: { type: Number, default:null },
-  myTarget: { type: Number, default:null },
-  walletMember: { type: Boolean, default:false },
-  friendMember: { type: Boolean, default:true},
-  myWalletMembers: { type: [String], default:null },
-  myFixedExpenses: { type: [{ name: String, value: Number }],default:null },
-  myFixedIncomes: { type: [{ name: String, value: Number }],default:null },
-  passes: { type: Number,  default:5},
-  creditCardId: {type: String, default:null},
-  stripeCardId: {type: String, default:null}
+  maritalStatus: { type: Number, default: null },
+  addictedStatus: { type: Number, default: null },
+  myTarget: { type: Number, default: null },
+  walletMember: { type: Boolean, default: false },
+  friendMember: { type: Boolean, default: true },
+  myWalletMembers: { type: [String], default: null },
+  myFixedExpenses: { type: [{ name: String, value: Number }], default: null },
+  myFixedIncomes: { type: [{ name: String, value: Number }], default: null },
+  passes: { type: Number, default: 5 },
+  updatePassedMonth:{ type: Number, default: new Date(Date.now()).getMonth()+1 },
+  creditCardId: { type: String, default: null },
+  stripeCardId: { type: String, default: null }
 });
 
 export interface User extends mongoose.Document {
@@ -38,6 +39,7 @@ export interface User extends mongoose.Document {
   myFixedExpenses: [{ name: string, value: number }];
   myFixedIncomes: [{ name: string, value: number }];
   passes: number;
+  updatePassedMonth:number;
   creditCardId: string;
   stripeCardId: string;
 }

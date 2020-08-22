@@ -18,6 +18,7 @@ export class RequestService {
 
   async createRequest(requestDto: RequestDto): Promise<Request> {
     try {
+      await this._userService.updatePasses(requestDto.email);
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
@@ -73,8 +74,6 @@ export class RequestService {
           request.friendsConfirmation[i].confirm = confirmationStatus;
         }
       }
-
-
       request.save();
       this.httpService.post(mlServer, {
         'req_id': request.id,
