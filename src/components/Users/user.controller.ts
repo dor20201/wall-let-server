@@ -15,6 +15,11 @@ export class UserController {
     return await this._userService.getUserById(userId);
   }
 
+  @Post('usersInfo')
+  async getUsersInfo(@Body('email') email:string){
+    return await this._userService.getUsersInfoByWalletEmail(email);
+  }
+
   @Post('byEmail')
  async getUserByEmail(@Param('email') email: string):Promise<User> {
     return await this._userService.getUserByEmail(email);

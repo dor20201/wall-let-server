@@ -33,8 +33,8 @@ export class RequestController {
   async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: number,
                                        @Body('userType') userType: number,
                                        @Body('email') email: string): Promise<Request[]> {
-   return await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
-
+    const r = await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
+    return r;
   }
 
   @Get(':id')
@@ -94,8 +94,8 @@ export class RequestController {
   }
 
   @Post('remindFriend')
- async remindFriend(@Body('requestId') requestId: string):Promise<string> {
-     return await this._requestModel.remindFriends(requestId);
+  async remindFriend(@Body('requestId') requestId: string): Promise<string> {
+    return await this._requestModel.remindFriends(requestId);
   }
 
 }

@@ -4,17 +4,17 @@ import { CategoriesDto } from './dto/categories.dto';
 
 @Controller('categories')
 export class CategoriesController {
-  constructor(private categoryService: CategoriesService) {
+  constructor(private _categoryService: CategoriesService) {
   }
 
   @Post()
   addCategory(@Body('category') categoriesDto: CategoriesDto) {
-    this.categoryService.insertCategory(categoriesDto).then();
+    this._categoryService.insertCategory(categoriesDto).then();
   }
 
   @Get()
   getAllCategory() {
-    return this.categoryService.getCategory();
+    return this._categoryService.getCategories();
   }
 
 

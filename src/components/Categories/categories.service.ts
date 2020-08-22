@@ -20,7 +20,7 @@ export class CategoriesService {
     }
   }
 
-  async getCategory():Promise<Categories[]> {
+  async getCategories():Promise<Categories[]> {
    const categories =  await this._categoriesModel.find().exec();
    return categories;
   }

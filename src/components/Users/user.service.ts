@@ -49,10 +49,10 @@ export class UserService {
   }
 
   async getUserByPassword(userEmail: string, userPassword: string): Promise<User> {
-    const user = await this._userModel.findOne({ 'email': userEmail}).exec();
+    const user = await this._userModel.findOne({ 'email': userEmail }).exec();
     const decryptedPassword = encryption.decrypt(user.password);
 
-    if (!user || decryptedPassword !== userPassword ) {
+    if (!user || decryptedPassword !== userPassword) {
       throw new NotFoundException('The Email or Password are incorrect');
     }
     return user;
@@ -116,7 +116,7 @@ export class UserService {
 
   async addWalletFriend(userId: string, friendEmail: string) {
     try {
-      if(friendEmail == ""){
+      if (friendEmail == '') {
         throw new NotFoundException('The email is empty');
 
       }
@@ -165,19 +165,42 @@ export class UserService {
     }
   }
 
-  async whoFriendIam(email: string):Promise<string[]> {
-   const users =  await this._userModel.find({
-      "myWalletMembers":email
+  async whoFriendIam(email: string): Promise<string[]> {
+    const users = await this._userModel.find({
+      'myWalletMembers': email,
     }).exec();
 
-   const emails=[];
+    const emails = [];
 
-   for(let i =0; i<users.length;i++){
-     emails.push(users[i].email);
-   }
+    for (let i = 0; i < users.length; i++) {
+      emails.push(users[i].email);
+    }
 
-   return emails;
+    return emails;
   }
+
+  async getUserInfo(email: string) {
+    const user = await this._userModel.findOne({ 'email': email });
+    const u = {
+      'fullName': user.firstName + ' ' + user.lastName,
+      'email': user.email,
+      'phoneNumber': user.phoneNumber,
+    };
+
+    return u;
+  }
+
+
+  async getUsersInfoByWalletEmail(email: string) {
+    const user = await this.getUserByEmail(email);
+    const m = user.myWalletMembers;
+    const usersInfo = [];
+    for (let i = 0; i < m.length; i++) {
+      usersInfo.push(this.getUserInfo(m[i]));
+    }
+    return usersInfo;
+  }
+
 }
 
 

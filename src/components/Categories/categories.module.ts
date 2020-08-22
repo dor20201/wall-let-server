@@ -7,7 +7,8 @@ import {CategoriesSchema } from './categories.model';
 @Module({
     imports: [MongooseModule.forFeature([{name:'Categories',schema: CategoriesSchema}])],
     controllers:[CategoriesController],
-    providers: [CategoriesService]
+    providers: [CategoriesService],
+    exports:[CategoriesService]
 })
 export class CategoriesModule {
 

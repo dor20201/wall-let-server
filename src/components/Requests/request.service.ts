@@ -3,16 +3,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request } from './request.model';
 import { Model } from 'mongoose';
 import { RequestDto } from './dto/request.dto';
-import { NotificationService } from '../Notification/notification.service';
 import { UserService } from '../Users/user.service';
 import { MailService } from '../Mail/mail.service';
 import { Mail } from '../Mail/mail.model';
+import { CategoriesService } from '../Categories/categories.service';
 
 
 @Injectable()
 export class RequestService {
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
-              private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService, private httpService: HttpService) {
+              private _userService: UserService, private  _mailService: MailService,
+              private httpService: HttpService, private  _categoriesService: CategoriesService) {
 
   }
 
@@ -65,14 +66,13 @@ export class RequestService {
       return await this._requestModel.find({
         'confirmationStatus': confirmationStatus,
         'friendsConfirmation': {
-          'email': email
-          , 'confirm': 0,
+          'email': email,
+          'confirm': 0
         },
       }).exec();
 //'walletMember'
     } else if (userType == 0) {
-      return await this._requestModel.find({ 'email': email, 'confirmationStatus': {$in: [0,1]} }).exec();
-
+      return await this._requestModel.find({ 'email': email, 'confirmationStatus': { $in: [0, 1] } }).exec();
     }
   }
 
@@ -81,7 +81,7 @@ export class RequestService {
   }
 
   async reactToRequest(id: string, email: string, confirmationStatus: number) {
-    const mlServer = 'http://e521a900b171.ngrok.io/req';
+    const mlServer = 'http://65f576e437e1.ngrok.io/req';
     let request;
     try {
       request = await this.getRequestById(id);
@@ -91,10 +91,23 @@ export class RequestService {
         }
       }
       request.save();
+
+      const user = await this._userService.getUserByEmail(request.email);
+      const requests = await this.getAllRequestsByUserType(0, request.email);
+      const categories = await this._categoriesService.getCategories();
+
+      const MLObject = {
+        'the_request': request,
+        'request': requests,
+        'user': user,
+        'categories': categories,
+      };
+
       this.httpService.post(mlServer, {
-        'req_id': request.id,
-        'email': request.email,
-        'botScore': request.botScore,
+        'the_request': request,
+        'Request': requests,
+        'User': user,
+        'categories': categories,
       });
       return 'Answer received ';
     } catch (e) {
@@ -150,7 +163,7 @@ export class RequestService {
       content: 'Your request to buy ' + request.description + ' has been approved :) ',
     };
     await this._mailService.sendMail(mail);
-    return 'Request ' + requestId + 'has been approved';
+    return 'Request ' + requestId + ' has been approved';
   }
 
   async insertScore(requestId: string, score: number): Promise<string> {
@@ -296,7 +309,6 @@ export class RequestService {
 
     return 'reminders were sends';
   }
-
 
   async getApproveVsAll(email: string) {
     const allRequest = await this._requestModel.find({
