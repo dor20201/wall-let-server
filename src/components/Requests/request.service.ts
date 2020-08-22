@@ -63,12 +63,15 @@ export class RequestService {
     //friendMember
     if (userType == 1) {
       return await this._requestModel.find({
-        'friendsConfirmation.email': email,
         'confirmationStatus': confirmationStatus,
+        'friendsConfirmation': {
+          'email': email
+          , 'confirm': 0,
+        },
       }).exec();
 //'walletMember'
     } else if (userType == 0) {
-      return await this._requestModel.find({ 'email': email, 'confirmationStatus': confirmationStatus }).exec();
+      return await this._requestModel.find({ 'email': email, 'confirmationStatus': {$in: [0,1]} }).exec();
 
     }
   }
