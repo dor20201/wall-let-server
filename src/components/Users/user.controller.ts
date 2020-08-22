@@ -24,13 +24,15 @@ export class UserController {
   @Post('logIn')
   async logIn(@Body('email') userEmail: string,
          @Body('password') userPassword: string):Promise<User> {
-    return await this._userService.getUserByPassword(userEmail, encryption.encrypt(userPassword));
+    return await this._userService.getUserByPassword(userEmail, userPassword);
   }
 
   //checked
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
     userDto.password = encryption.encrypt(userDto.password);
+    userDto.answerPassword = encryption.encrypt(userDto.answerPassword);
+
     const user = await this._userService.insertUser(userDto);
     return user;
   };

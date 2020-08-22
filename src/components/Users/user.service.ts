@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './user.model';
 import { Model } from 'mongoose';
 import { UserDto, WalletMemberDto } from './dto/user.dto';
+import { encryption } from '../Common/encryption';
 
 @Injectable()
 export class UserService {
@@ -33,8 +34,10 @@ export class UserService {
   }
 
   async getUserByPassword(userEmail: string, userPassword: string): Promise<User> {
-    const user = await this._userModel.findOne({ 'email': userEmail, 'password': userPassword }).exec();
-    if (!user) {
+    const user = await this._userModel.findOne({ 'email': userEmail}).exec();
+    const decryptedPassword = encryption.decrypt(user.password);
+
+    if (!user || decryptedPassword !== userPassword ) {
       throw new NotFoundException('The Email or Password are incorrect');
     }
     return user;
@@ -44,7 +47,7 @@ export class UserService {
     let user;
     try {
       user = await this._userModel.findOne({ email: email }).exec();
-      return user.answerPassword == answer;
+      return encryption.decrypt(user.answerPassword) == answer;
     } catch (e) {
       throw new NotFoundException('could not find user');
     }
