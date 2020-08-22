@@ -82,7 +82,6 @@ export class RequestService {
     const approvedNum: number = request.friendsConfirmation.map(o => o[1] == true).length;
     if (totalFriends < 2 * approvedNum) {
       request.confirmationStatus = true;
-      request.closedDate = Date.now();
       await request.save();
 
       const mail: Mail = {
@@ -190,7 +189,6 @@ export class RequestService {
 
   async completedRequest(requestId) {
     const request = await this.getRequestById(requestId);
-    request.transaction = true;
     request.closedDate = Date.now();
     await request.save();
     const mail: Mail = {

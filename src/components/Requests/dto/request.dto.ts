@@ -13,6 +13,4 @@ export class RequestDto {
   confirmationStatus: boolean;
   botScore: number;
   subCategory: string;
-  transaction:boolean;
-
 }
