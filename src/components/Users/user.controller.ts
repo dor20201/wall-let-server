@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, WalletMemberDto } from './dto/user.dto';
 import { User } from './user.model';
+import { encryption } from '../Common/encryption';
 
 @Controller('user')
 export class UserController {
@@ -29,6 +30,9 @@ export class UserController {
   //checked
   @Post('signIn')
   async addUser(@Body('userDto')userDto: UserDto): Promise<User> {
+    userDto.password = encryption.encrypt(userDto.password);
+    userDto.answerPassword = encryption.encrypt(userDto.answerPassword);
+
     const user = await this._userService.insertUser(userDto);
     return user;
   };
@@ -48,7 +52,7 @@ export class UserController {
 
   @Post('updatePassword')
   async updatePassword(@Body('email') email:string,@Body('newPassword')newPassword: string): Promise<string> {
-    return  await this._userService.updatePassword(email,newPassword);
+    return  await this._userService.updatePassword(email,encryption.encrypt(newPassword));
   };
 
   // add friend member to my walletMember list
