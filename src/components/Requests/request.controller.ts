@@ -65,7 +65,7 @@ export class RequestController {
   @Post('ReactToRequest')
   async ReactToRequest(@Body('id') id: string,
                        @Body('email') email: string,
-                       @Body('confirmationStatus') confirmationStatus: boolean): Promise<string> {
+                       @Body('confirmationStatus') confirmationStatus: number): Promise<string> {
     return await this._requestModel.reactToRequest(id, email, confirmationStatus);
   }
 

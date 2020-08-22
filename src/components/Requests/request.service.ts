@@ -60,12 +60,11 @@ export class RequestService {
     return this._requestModel.findOne({ '_id': id }).exec();
   }
 
-  async reactToRequest(id: string, email: string, confirmationStatus: boolean) {
+  async reactToRequest(id: string, email: string, confirmationStatus: number) {
     const mlServer = 'http://e521a900b171.ngrok.io/req';
     let request;
     try {
       request = await this.getRequestById(id);
-    //  request.friendsConfirmation.map(o => o.email == email).reduce(o => o.confirm = confirmationStatus);
       for(let i =0;i<request.friendsConfirmation.length;i++){
         if(request.friendsConfirmation[i].email == email ){
           request.friendsConfirmation[i].confirm = confirmationStatus;
