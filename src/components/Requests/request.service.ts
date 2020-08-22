@@ -16,13 +16,13 @@ export class RequestService {
               private _notificationService: NotificationService, private _userService: UserService, private  _mailService: MailService) {
   }
 
-  async createRequest(requestDto: RequestDto): Promise<string> {
+  async createRequest(requestDto: RequestDto): Promise<Request> {
     try {
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
-      return result._id;
+      return result;
     } catch (e) {
       throw new NotFoundException('could not create Request');
 
@@ -62,12 +62,12 @@ export class RequestService {
     return this._requestModel.findOne({ '_id': id }).exec();
   }
 
-  async reactToRequest(id: string, email: string, answer: string) {
+  async reactToRequest(id: string, email: string, confirmationStatus: boolean) {
     let request;
     try {
       request = await this.getRequestById(id);
 
-      request.friendsConfirmation.map(o => o.email == email).reduce(o => o.confirm = answer);
+      request.friendsConfirmation.map(o => o.email == email).reduce(o => o.confirm = confirmationStatus);
       request.save();
       await this.isRequestApprove(id);
       return 'Answer received ';
@@ -237,6 +237,32 @@ export class RequestService {
       throw new NotFoundException('the Request has not deleted')
     }
   }
+
+ async getRequestByOpenDate(userType: number, email: string, openDate: number) :Promise<Request[]>{
+
+    if(userType == 0){
+     return await this._requestModel.find({'openDate':openDate,'email':email}).exec()
+
+    }else if(userType == 1){
+
+      return await this._requestModel.find({ 'openDate':openDate,'friendsConfirmation.email': { $contains: email }}).exec()
+    }
+  }
+
+  async getRequestByClosedDate(userType: number, email: string, closedDate: number) :Promise<Request[]>{
+
+    if(userType == 0){
+      return await this._requestModel.find({'closedDate':closedDate,'email':email}).exec()
+
+    }else if(userType == 1){
+
+      return await this._requestModel.find({ 'closedDate':closedDate,'friendsConfirmation.email': { $contains: email }}).exec()
+    }
+  }
+
+
+
+
 }
 
 
