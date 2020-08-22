@@ -46,16 +46,17 @@ export class FinancialService {
 
     const user = await this._userService.getUserById(walletMemberId);
 
-
     // Check if the details are valid
     if (user == null || !user.walletMember) {
       return null;
     }
 
     const newCreditCard : any = await this._creditCardModel.findOne({ 'walletMemberId': walletMemberId }).exec();
+
     if (newCreditCard && newCreditCard.creditCardNumber) {
       newCreditCard.creditCardNumber = encryption.decrypt(newCreditCard.creditCardNumber);
     }
+
     return newCreditCard;
   }
 
