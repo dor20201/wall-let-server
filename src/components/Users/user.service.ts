@@ -158,17 +158,25 @@ export class UserService {
   async updatePasses(email: string) {
     const user = await this.getUserByEmail(email);
     const currentMonth = new Date(Date.now()).getMonth() + 1;
-    if (user.updatePassedMonth != currentMonth) {
+    if (user.updatePassesMonth != currentMonth) {
       user.passes = user.addictedStatus;
-      user.updatePassedMonth = currentMonth;
+      user.updatePassesMonth = currentMonth;
       await user.save();
     }
   }
 
-  async whoFriendIam(email: string) {
-   return await this._userModel.find({
+  async whoFriendIam(email: string):Promise<string[]> {
+   const users =  await this._userModel.find({
       "myWalletMembers":email
     }).exec();
+
+   const emails=[];
+
+   for(let i =0; i<users.length;i++){
+     emails.push(users[i].email);
+   }
+
+   return emails;
   }
 }
 

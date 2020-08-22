@@ -312,9 +312,30 @@ export class RequestService {
   async getExpenseByCategory(email: string) {
     return this._requestModel.aggregate([
       { 'email': email, 'confirmationStatus': 2 },
-      { $group: { category: '$category', total: { $sum: '$cost' } } }
+      { $group: { category: '$category', total: { $sum: '$cost' } } },
     ]);
   }
+
+  async getApprovedVsDenied(email: string) {
+    const approve = this._requestModel.find({
+      'email': email,
+      'confirmationStatus': { $in: [1, 2] },
+    }).count();
+
+    const Denied = this._requestModel.find({
+      'email': email,
+      'confirmationStatus': { $in: [0, 3] },
+    }).count();
+
+    return {
+      'Approved': approve,
+      'Denied': Denied,
+    };
+
+
+  }
+
+
 }
 
 

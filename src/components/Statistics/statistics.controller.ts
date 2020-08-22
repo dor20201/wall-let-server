@@ -17,9 +17,8 @@ export class StatisticsController {
   }
 
   //for friend Member
-
-  @Post('getMyWalletMember')
-  async getMyWalletMember(@Body('myEmail') email: string): Promise<User[]> {
+  @Post('myWalletMembers')
+  async getMyWalletMember(@Body('myEmail') email: string): Promise<string[]> {
     return await this._userService.whoFriendIam(email);
   }
 
@@ -30,34 +29,39 @@ export class StatisticsController {
   }
 
 
-
   //walletMember
+
+  @Post("approvedVsDenied")
+  async approvedVsDenied(@Body('email') email:string){
+    return await this._statisticsService.getApprovedVsDenied(email);
+  }
 
   @Post('expenseByCategory')
   async getExpenseByCategory(@Body('email') email:string){
     return await this._statisticsService.getExpenseByCategory(email);
   }
 
+  @Post('MonthlyBalance')
+  async getMonthlyBalance(@Body('email') email: string): Promise<number> {
+    return this._statisticsService.GetMonthlyBalance(email);
+  }
 
-  @Get(':myEmail')
-  async getMoneyISaved(@Param('myEmail') myEmail: string): Promise<number> {
+  @Post('MoneyISaved')
+  async getMoneyISaved(@Body('myEmail') myEmail: string): Promise<number> {
     return this._requestService.moneySavedSinceEver(myEmail);
   }
 
-  @Get(':myEmail&:myFriendEmail')
-  async getMoneySavedForMyBuddy(@Param('myEmail') myEmail: string, @Param('myFriendEmail') myFriendEmail: string): Promise<number> {
+  @Post('MoneySavedForMyBuddy')
+  async getMoneySavedForMyBuddy(@Body('email') myEmail: string, @Body('myFriendEmail') myFriendEmail: string): Promise<number> {
     return this._requestService.moneySavedForMyBuddy(myEmail, myFriendEmail);
   }
 
-  @Post('monthMoney')
+  @Post('moneyISpentThisMonth')
   async getMoneyISpentThisMonth(@Body('email') email: string): Promise<number> {
     return this._requestService.howMuchISpentThisMonth(email);
   }
 
-  @Get('MonthlyBalance&:email')
-  async getMonthlyBalance(@Param('email') email: string): Promise<number> {
-    return this._statisticsService.GetMonthlyBalance(email);
-  }
+
 
 
 }

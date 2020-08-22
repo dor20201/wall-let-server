@@ -17,7 +17,7 @@ export const UserSchema = new mongoose.Schema({
   myFixedExpenses: { type: [{ name: String, value: Number }], default: null },
   myFixedIncomes: { type: [{ name: String, value: Number }], default: null },
   passes: { type: Number, default: 5 },
-  updatePassedMonth:{ type: Number, default: new Date(Date.now()).getMonth()+1 },
+  updatePassesMonth:{ type: Number, default: new Date(Date.now()).getMonth()+1 },
   creditCardId: { type: String, default: null },
   stripeCardId: { type: String, default: null }
 });
@@ -39,7 +39,7 @@ export interface User extends mongoose.Document {
   myFixedExpenses: [{ name: string, value: number }];
   myFixedIncomes: [{ name: string, value: number }];
   passes: number;
-  updatePassedMonth:number;
+  updatePassesMonth:number;
   creditCardId: string;
   stripeCardId: string;
 }
