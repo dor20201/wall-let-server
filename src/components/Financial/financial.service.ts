@@ -79,7 +79,7 @@ export class FinancialService {
     // Check if to do the transaction
     if ((await this.findTransactionByRequestId(requestId)) ||
       !request ||
-      !request.confirmationStatus || !walletMember ||
+      request.confirmationStatus !== 1 || !walletMember ||
       walletMember.email !== request.email || !creditCard) {
       return null;
     }
