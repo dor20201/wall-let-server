@@ -11,13 +11,28 @@ export class UserService {
   constructor(@InjectModel('User') private readonly _userModel: Model<User>) {
   }
 
+
+  async checkIfEmailIsAvailable(email: string): Promise<boolean> {
+    const user = await this._userModel.findOne({ 'email': email }).exec().then();
+    return !user;
+
+  }
+
   async insertUser(userDto: UserDto): Promise<User> {
     try {
-      const newUser = new this._userModel(userDto);
-      return await newUser.save();
+      const available = await this.checkIfEmailIsAvailable(userDto.email);
+
+      if (available) {
+        const newUser = new this._userModel(userDto);
+        return await newUser.save();
+      } else {
+        throw new NotFoundException('The Email you insert already exist ');
+      }
+
     } catch (e) {
       throw new NotFoundException('The Users were not insert correctly ');
     }
+
   }
 
   async getUserById(userId: string): Promise<User> {
@@ -101,21 +116,27 @@ export class UserService {
 
   async addWalletFriend(userId: string, friendEmail: string) {
     try {
-      await this.getUserByEmail(friendEmail);
-    } catch (e) {
-      throw new NotFoundException('The Friend user were not found');
+      if(friendEmail == ""){
+        throw new NotFoundException('The email is empty');
 
-    }
-    const user: User = await this._userModel.findById(userId).exec();
-    for (let i = 0; i < user.myWalletMembers.length; i++) {
-      if (user.myWalletMembers[i] = friendEmail) {
-        throw new NotFoundException('The friend you are trying to add is already in the WalletMember');
       }
-    }
+      const available = await this.checkIfEmailIsAvailable(friendEmail);
+      if (!available) {
+        const user: User = await this._userModel.findById(userId).then();
+        for (let i = 0; i < user.myWalletMembers.length; i++) {
+          if (user.myWalletMembers[i] == friendEmail) {
+            throw new NotFoundException('The friend you are trying to add is already in the WalletMember');
+          }
+        }
 
-    user.myWalletMembers.push(friendEmail);
-    await user.save();
-    return user;
+        user.myWalletMembers.push(friendEmail);
+        await user.save();
+        return user;
+      }
+    } catch (e) {
+      throw new NotFoundException(e + ' The Friend user were not found');
+
+    }
   }
 
   async getUsersByEmails(emails: string[]): Promise<any> {

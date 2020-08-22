@@ -34,41 +34,37 @@ export class RequestService {
     return this._requestModel.find({});
   }
 
-
-  getAllRequestsByUserType(userType: number, Email: string): Promise<Request[]> {
+ async getAllRequestsByUserType(userType: number, Email: string): Promise<Request[]> {
     if (userType == 1) {
-      return this._requestModel.find({ 'friendsConfirmation.email': Email }).exec();
+      return await this._requestModel.find({ 'friendsConfirmation.email': Email }).exec();
     } else if (userType == 0) {
-      return this._requestModel.find({ 'email': Email }).exec();
+      return await this._requestModel.find({ 'email': Email }).exec();
     }
   }
 
-
-  getRequestsByStatus(userType: number, confirmationStatus: boolean, Email: string): Promise<Request[]> {
+  async getRequestsByStatus(userType: number, confirmationStatus: number, email: string): Promise<Request[]> {
     //friendMember
     if (userType == 1) {
-      return this._requestModel.find({
-        'friendsConfirmation.email': Email,
+      return await this._requestModel.find({
+        'friendsConfirmation.email':  email,
         'confirmationStatus': confirmationStatus,
       }).exec();
 //'walletMember'
     } else if (userType == 0) {
-      return this._requestModel.find({ 'email': Email, 'confirmationStatus': confirmationStatus }).exec();
+      return  await this._requestModel.find({ 'email': email, 'confirmationStatus': confirmationStatus }).exec();
 
     }
   }
-
 
   async getRequestById(id: string): Promise<Request> {
     return this._requestModel.findOne({ '_id': id }).exec();
   }
 
-  async reactToRequest(id: string, email: string, confirmationStatus: boolean) {
+  async reactToRequest(id: string, email: string, confirmationStatus: number) {
     const mlServer = 'http://e521a900b171.ngrok.io/req';
     let request;
     try {
       request = await this.getRequestById(id);
-    //  request.friendsConfirmation.map(o => o.email == email).reduce(o => o.confirm = confirmationStatus);
       for(let i =0;i<request.friendsConfirmation.length;i++){
         if(request.friendsConfirmation[i].email == email ){
           request.friendsConfirmation[i].confirm = confirmationStatus;
@@ -91,7 +87,7 @@ export class RequestService {
     const totalFriends: number = request.friendsConfirmation.length;
     const approvedNum: number = request.friendsConfirmation.map(o => o[1] == true).length;
     if (totalFriends < 2 * approvedNum) {
-      request.confirmationStatus = true;
+      request.confirmationStatus = 1;
       await request.save();
 
       const mail: Mail = {
@@ -108,8 +104,7 @@ export class RequestService {
     const request = await this.getRequestById(requestId);
     const user = await this._userService.getUserById(userId);
     if (user.passes > 0) {
-      request.confirmationStatus = true;
-      request.closedDate = Date.now();
+      request.confirmationStatus = 1;
       await request.save();
       user.passes = user.passes - 1;
       await user.save();
@@ -127,7 +122,7 @@ export class RequestService {
 
   async approveByML(requestId): Promise<string> {
     const request = await this.getRequestById(requestId);
-    request.confirmationStatus = true;
+    request.confirmationStatus = 1;
     await request.save();
     const mail: Mail = {
       sendTo: request.email,
@@ -146,7 +141,7 @@ export class RequestService {
   }
 
   async moneySavedSinceEver(email: string): Promise<number> {
-    const requests: Request[] = await this._requestModel.find({ 'email': email, 'confirmationStatus': false });
+    const requests: Request[] = await this._requestModel.find({ 'email': email, 'confirmationStatus': { $in: [ 0, 3 ] } });
     return requests.map(r => r.cost).reduce(function(a: number, b: number) {
       return a + b;
     });
@@ -171,17 +166,13 @@ export class RequestService {
 
   }
 
-  async requestsByStatus(email: string, status: boolean): Promise<Request[]> {
-    return this._requestModel.find({ 'email': email, 'confirmationStatus': status });
-  }
-
   async howMuchISpentThisMonth(email: string) {
     const d = new Date();
     const month = d.getMonth();
     const year = d.getFullYear();
     const requests: Request[] = await this._requestModel.find({
       'email': email,
-      'confirmationStatus': true,
+      'confirmationStatus': 2,
       'openedDate': { $lt: new Date(), $gt: new Date(year + ',' + month) },
     });
 
@@ -197,6 +188,7 @@ export class RequestService {
 
   async completedRequest(requestId) {
     const request = await this.getRequestById(requestId);
+    request.confirmationStatus = 2;
     request.closedDate = Date.now();
     await request.save();
     const mail: Mail = {
@@ -278,6 +270,8 @@ export class RequestService {
     const emails = request.friendsConfirmation.map(o => o.email);
 
     await this._mailService.sendMails(emails, 'reminder to approve request', 'we remind you to response to ' + request.email + ' request');
+
+    return "reminders were sends"
   }
 
 
