@@ -7,6 +7,7 @@ import { stripeData } from './stripeData';
 import { User } from '../Users/user.model';
 import { UserDto, WalletMemberDto } from '../Users/dto/user.dto';
 import { Request } from '../Requests/request.model';
+import { encryption } from '../Common/encryption';
 
 @Injectable()
 export class FinancialService {
@@ -32,7 +33,7 @@ export class FinancialService {
     }
 
     newCreditCard.companyName = companyName;
-    newCreditCard.creditCardNumber = creditCardNumber;
+    newCreditCard.creditCardNumber =encryption.encrypt(creditCardNumber);
     newCreditCard.cvc = cvc;
     newCreditCard.walletMemberId = walletMemberId;
     newCreditCard.valid = valid;
@@ -52,7 +53,9 @@ export class FinancialService {
     }
 
     const newCreditCard : any = await this._creditCardModel.findOne({ 'walletMemberId': walletMemberId }).exec();
-
+    if (newCreditCard && newCreditCard.creditCardNumber) {
+      newCreditCard.creditCardNumber = encryption.decrypt(newCreditCard.creditCardNumber);
+    }
     return newCreditCard;
   }
 
