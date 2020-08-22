@@ -16,9 +16,26 @@ export class RequestService {
 
   }
 
+
+  createFriendConfirmation(friendEmails: string[]): [{ email: string, confirm: number }] {
+    let friendsConfirmation: [{ email: string, confirm: number }];
+
+    for (let i = 0; i < friendEmails.length; i++) {
+      friendsConfirmation.push({
+        'email': friendEmails[i],
+        'confirm': 0,
+      });
+    }
+    ;
+
+    return friendsConfirmation;
+  }
+
   async createRequest(requestDto: RequestDto): Promise<Request> {
     try {
       await this._userService.updatePasses(requestDto.email);
+      const user = await this._userService.getUserByEmail(requestDto.email);
+      requestDto.friendsConfirmation = this.createFriendConfirmation(user.myWalletMembers);
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
@@ -34,7 +51,7 @@ export class RequestService {
     return this._requestModel.find({});
   }
 
- async getAllRequestsByUserType(userType: number, Email: string): Promise<Request[]> {
+  async getAllRequestsByUserType(userType: number, Email: string): Promise<Request[]> {
     if (userType == 1) {
       return await this._requestModel.find({ 'friendsConfirmation.email': Email }).exec();
     } else if (userType == 0) {
@@ -46,12 +63,12 @@ export class RequestService {
     //friendMember
     if (userType == 1) {
       return await this._requestModel.find({
-        'friendsConfirmation.email':  email,
+        'friendsConfirmation.email': email,
         'confirmationStatus': confirmationStatus,
       }).exec();
 //'walletMember'
     } else if (userType == 0) {
-      return  await this._requestModel.find({ 'email': email, 'confirmationStatus': confirmationStatus }).exec();
+      return await this._requestModel.find({ 'email': email, 'confirmationStatus': confirmationStatus }).exec();
 
     }
   }
@@ -65,8 +82,8 @@ export class RequestService {
     let request;
     try {
       request = await this.getRequestById(id);
-      for(let i =0;i<request.friendsConfirmation.length;i++){
-        if(request.friendsConfirmation[i].email == email ){
+      for (let i = 0; i < request.friendsConfirmation.length; i++) {
+        if (request.friendsConfirmation[i].email == email) {
           request.friendsConfirmation[i].confirm = confirmationStatus;
         }
       }
@@ -141,7 +158,10 @@ export class RequestService {
   }
 
   async moneySavedSinceEver(email: string): Promise<number> {
-    const requests: Request[] = await this._requestModel.find({ 'email': email, 'confirmationStatus': { $in: [ 0, 3 ] } });
+    const requests: Request[] = await this._requestModel.find({
+      'email': email,
+      'confirmationStatus': { $in: [0, 3] },
+    });
     return requests.map(r => r.cost).reduce(function(a: number, b: number) {
       return a + b;
     });
@@ -271,11 +291,32 @@ export class RequestService {
 
     await this._mailService.sendMails(emails, 'reminder to approve request', 'we remind you to response to ' + request.email + ' request');
 
-    return "reminders were sends"
+    return 'reminders were sends';
   }
 
 
+  async getApproveVsAll(email: string) {
+    const allRequest = await this._requestModel.find({
+      'friendsConfirmation.email': email,
+    }).count();
+
+    const allRequestApproved = await this._requestModel.find({
+      'friendsConfirmation.email': email,
+      'confirm': 1,
+    }).count();
+
+    if (allRequest != 0)
+      return allRequestApproved / allRequest;
+  }
+
+  async getExpenseByCategory(email: string) {
+    return this._requestModel.aggregate([
+      { 'email': email, 'confirmationStatus': 2 },
+      { $group: { category: '$category', total: { $sum: '$cost' } } }
+    ]);
+  }
 }
+
 
 
 

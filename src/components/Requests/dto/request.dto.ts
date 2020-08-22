@@ -9,7 +9,7 @@ export class RequestDto {
   necessity: number;
   additionalDescription: string;
   pic: string;
-  friendsConfirmation: [{ email: string, confirm: boolean }];
+  friendsConfirmation: [{ email: string, confirm: number }];
   confirmationStatus: boolean;
   botScore: number;
   subCategory: string;

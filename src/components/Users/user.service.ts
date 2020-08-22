@@ -164,6 +164,12 @@ export class UserService {
       await user.save();
     }
   }
+
+  async whoFriendIam(email: string) {
+   return await this._userModel.find({
+      "myWalletMembers":email
+    }).exec();
+  }
 }
 
 
