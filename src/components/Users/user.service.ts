@@ -162,13 +162,11 @@ export class UserService {
 
   async getUserInfo(email: string) {
     const user = await this._userModel.findOne({ 'email': email }).exec();
-    const info = {
+    return {
       'fullName': user.firstName + ' ' + user.lastName,
       'email': user.email,
       'phoneNumber': user.phoneNumber,
     };
-
-    return info;
   }
 
   async getUsersInfoByWalletEmail(email: string) {
@@ -199,13 +197,11 @@ export class UserService {
         user.myWalletMembers.push(friendEmail);
         await user.save();
 
-        const friendEmailInfo = {
-          'email' : friendEmailUser.email,
+        return {
+          'email': friendEmailUser.email,
           'fullName': friendEmailUser.firstName + ' ' + friendEmailUser.lastName,
           'PhoneNumber': friendEmailUser.phoneNumber
-        }
-
-        return friendEmailInfo;
+        };
 
       }
     } catch (e) {
@@ -220,13 +216,11 @@ export class UserService {
      await user.save();
 
      const friendEmailUser = await this.getUserByEmail(friendEmail);
-     const friendEmailInfo = {
-       'email' : friendEmailUser.email,
+     return {
+       'email': friendEmailUser.email,
        'fullName': friendEmailUser.firstName + ' ' + friendEmailUser.lastName,
        'PhoneNumber': friendEmailUser.phoneNumber
-     }
-
-     return friendEmailInfo;
+     };
 
    }catch (e){
      throw new NotFoundException(e);

@@ -33,8 +33,7 @@ export class RequestController {
   async getRequestByConfirmationStatus(@Body('confirmationStatus') confirmationStatus: number,
                                        @Body('userType') userType: number,
                                        @Body('email') email: string): Promise<Request[]> {
-    const r = await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
-    return r;
+    return await this._requestModel.getRequestsByStatus(userType, confirmationStatus, email);
   }
 
   @Get(':id')

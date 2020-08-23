@@ -13,16 +13,14 @@ export class CategoriesService {
   async insertCategory(categoryDto: CategoriesDto) {
     try {
       const newCategory = new this._categoriesModel(categoryDto)
-      const result = await newCategory.save();
-      return result;
+      return await newCategory.save();
     } catch (e) {
       throw new NotFoundException('The category were not insert correctly ');
     }
   }
 
   async getCategories():Promise<Categories[]> {
-   const categories =  await this._categoriesModel.find().exec();
-   return categories;
+    return await this._categoriesModel.find().exec();
   }
 
 

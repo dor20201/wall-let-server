@@ -1,4 +1,4 @@
-import { HttpService, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpService, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from './request.model';
 import { Model } from 'mongoose';
@@ -7,11 +7,13 @@ import { UserService } from '../Users/user.service';
 import { MailService } from '../Mail/mail.service';
 import { Mail } from '../Mail/mail.model';
 import { CategoriesService } from '../Categories/categories.service';
+import { User } from '../Users/user.model';
 
 
 @Injectable()
 export class RequestService {
   constructor(@InjectModel('Request') private readonly _requestModel: Model<Request>,
+              @InjectModel('User') private readonly _userModel: Model<User>,
               private _userService: UserService, private  _mailService: MailService,
               private httpService: HttpService, private  _categoriesService: CategoriesService) {
 
@@ -22,19 +24,38 @@ export class RequestService {
     const friendsConfirmation: [{ email: string, confirm: number }] = [{ email: '', confirm: 0 }];
 
     for (let i = 0; i < friendEmails.length; i++) {
-      friendsConfirmation.push({
-        'email': friendEmails[i],
-        'confirm': 0,
-      });
+      if (i == 0) {
+        friendsConfirmation.pop();
+        friendsConfirmation.push({
+          'email': friendEmails[0],
+          'confirm': 0,
+        });
+      } else {
+        friendsConfirmation.push({
+          'email': friendEmails[i],
+          'confirm': 0,
+        });
+      }
     }
-    ;
+
 
     return friendsConfirmation;
   }
 
+  async sendMl(request: Request, user) {
+    const mlServer = 'http://65f576e437e1.ngrok.io/req';
+    const requests = await this.getAllRequestsByUserType(0, request.email);
+    const categories = await this._categoriesService.getCategories();
+    this.httpService.post(mlServer, {
+      'the_request': request,
+      'Request': requests,
+      'User': user,
+      'categories': categories,
+    });
+  }
+
   async createRequest(requestDto: RequestDto): Promise<Request> {
     try {
-      const mlServer = 'http://65f576e437e1.ngrok.io/req';
       await this._userService.updatePasses(requestDto.email);
       const user = await this._userService.getUserByEmail(requestDto.email);
       requestDto.friendsConfirmation = this.createFriendConfirmation(user.myWalletMembers);
@@ -43,22 +64,8 @@ export class RequestService {
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
 
-      const requests = await this.getAllRequestsByUserType(0, newRequest.email);
-      const categories = await this._categoriesService.getCategories();
 
-      const MLObject = {
-        'the_request': newRequest,
-        'request': requests,
-        'user': user,
-        'categories': categories,
-      };
-
-      this.httpService.post(mlServer, {
-        'the_request': newRequest,
-        'Request': requests,
-        'User': user,
-        'categories': categories,
-      });
+      await this.sendMl(newRequest, user);
 
       return result;
     } catch (e) {
@@ -109,7 +116,6 @@ export class RequestService {
   }
 
   async reactToRequest(id: string, email: string, confirmationStatus: number) {
-    const mlServer = 'http://65f576e437e1.ngrok.io/req';
     let request;
     try {
       request = await this.getRequestById(id);
@@ -119,25 +125,11 @@ export class RequestService {
         }
       }
       request.save();
-
       const user = await this._userService.getUserByEmail(request.email);
-      const requests = await this.getAllRequestsByUserType(0, request.email);
-      const categories = await this._categoriesService.getCategories();
 
-      const MLObject = {
-        'the_request': request,
-        'request': requests,
-        'user': user,
-        'categories': categories,
-      };
+      await this.sendMl(request, user);
 
-      this.httpService.post(mlServer, {
-        'the_request': request,
-        'Request': requests,
-        'User': user,
-        'categories': categories,
-      });
-      return 'Answer received ';
+      return 'Answer received';
     } catch (e) {
       throw new NotFoundException('could not find Request');
     }
@@ -161,9 +153,9 @@ export class RequestService {
     }
   }
 
-  async approveByPass(userId: string, requestId): Promise<string> {
+  async approveByPass(userId: string, requestId:string): Promise<string> {
     const request = await this.getRequestById(requestId);
-    const user = await this._userService.getUserById(userId);
+    const user = await this._userModel.findById(userId);
     if (user.passes > 0) {
       request.confirmationStatus = 1;
       await request.save();
@@ -176,7 +168,7 @@ export class RequestService {
       };
       await this._mailService.sendMail(mail);
 
-      return 'Request ' + requestId + 'has been approved';
+      return 'Request has been approved';
     }
     return 'User dont have passes';
   }
@@ -195,9 +187,26 @@ export class RequestService {
   }
 
   async insertScore(requestId: string, score: number): Promise<string> {
-    const request = await this.getRequestById(requestId);
+    let request;
+    try {
+      request = await this.getRequestById(requestId);
+    } catch (e) {
+      throw new NotFoundException('The request has not found');
+    }
     request.botScore = score;
     await request.save();
+    const mlServer = 'http://b820cdb00bca.ngrok.io/req';
+
+    const user = await this._userService.getUserByEmail(request.email);
+    const requests = await this.getAllRequestsByUserType(0, request.email);
+    const categories = await this._categoriesService.getCategories();
+    this.httpService.post(mlServer, {
+      'the_request': request,
+      'Request': requests,
+      'User': user,
+      'categories': categories,
+    });
+
     return 'botScore insert correctly';
   }
 
@@ -226,8 +235,7 @@ export class RequestService {
   }
 
   async requestsByCategory(email: string, category: string): Promise<Request[]> {
-    return this._requestModel.find({ 'email': email, category: category });
-
+    return await this._requestModel.find({ 'email': email, category: category }).exec();
   }
 
   async howMuchISpentThisMonth(email: string) {
@@ -238,12 +246,16 @@ export class RequestService {
       'email': email,
       'confirmationStatus': 2,
       'openedDate': { $lt: new Date(), $gt: new Date(year + ',' + month) },
-    });
+    }).exec();
 
     try {
-      return requests.map(r => r.cost).reduce(function(a: number, b: number) {
-        return a + b;
-      });
+      if (requests.length != 0) {
+        return requests.map(r => r.cost).reduce(function(a: number, b: number) {
+          return a + b;
+        });
+      } else {
+        return 0;
+      }
     } catch (e) {
       throw new NotFoundException(e);
     }
@@ -340,35 +352,39 @@ export class RequestService {
 
   async getApproveVsAll(email: string) {
     const allRequest = await this._requestModel.find({
-      'friendsConfirmation.email': email,
-    }).count();
+      'email': email,
+    }).countDocuments().exec();
 
-    const allRequestApproved = await this._requestModel.find({
-      'friendsConfirmation.email': email,
-      'confirm': 1,
-    }).count();
+    const approve = await this._requestModel.find({
+      'email': email,
+      'confirmationStatus': { $in: [1, 2] },
+    }).countDocuments().exec();
 
     if (allRequest != 0)
-      return allRequestApproved / allRequest;
+      return approve / allRequest;
   }
 
   async getExpenseByCategory(email: string) {
-    return this._requestModel.aggregate([
-      { 'email': email, 'confirmationStatus': 2 },
+    const t = await this._requestModel.aggregate([
+      { $match: { 'email': email, 'confirmationStatus': 2 } },
       { $group: { category: '$category', total: { $sum: '$cost' } } },
-    ]);
+    ]).exec(function(e, d) {
+      console.log(d);
+    });
+    return t;
+
   }
 
   async getApprovedVsDenied(email: string) {
-    const approve = this._requestModel.find({
+    const approve = await this._requestModel.find({
       'email': email,
       'confirmationStatus': { $in: [1, 2] },
-    }).count();
+    }).countDocuments().exec();
 
-    const Denied = this._requestModel.find({
+    const Denied = await this._requestModel.find({
       'email': email,
       'confirmationStatus': { $in: [0, 3] },
-    }).count();
+    }).countDocuments().exec();
 
     return {
       'Approved': approve,

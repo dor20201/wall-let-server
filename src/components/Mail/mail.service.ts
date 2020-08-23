@@ -34,19 +34,23 @@ export class MailService {
 
   async sendMails(emails: string[], subject: string, text: string): Promise<string> {
     try {
-
-
-      let mail: Mail;
-
-      for (const email of emails) {
-        mail = {
-          sendTo: email,
-          subject: subject,
-          content: text,
-        };
-        await this.sendMail(mail);
-        return 'Sending mails succeed';
+      for (const e of emails) {
+        await this.sendMail({
+          'sendTo': e,
+          'subject': subject,
+          'content': text,
+        });
       }
+
+      // for (const email of emails) {
+      //   Mail = {
+      //     "sendTo": email,
+      //     "subject": subject,
+      //     "content": text,
+      //   };
+      //   await this.sendMail(Mail).then();
+      return 'Sending mails succeed';
+
     } catch (e) {
       throw new NotFoundException('Could not send mails');
     }
