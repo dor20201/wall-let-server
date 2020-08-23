@@ -51,16 +51,16 @@ export class UserService {
 
   async getUserByPassword(userEmail: string, userPassword: string): Promise<User> {
     const user = await this._userModel.findOne({ 'email': userEmail }).exec();
-    if(user){
-    const decryptedPassword = encryption.decrypt(user.password);
+    if (user) {
+      const decryptedPassword = encryption.decrypt(user.password);
 
 
-    if (!user || decryptedPassword !== userPassword) {
+      if (!user || decryptedPassword !== userPassword) {
+        throw new NotFoundException('The Email or Password are incorrect');
+      }
+      return user;
+    } else {
       throw new NotFoundException('The Email or Password are incorrect');
-    }
-    return user;
-    }else {
-      throw new NotFoundException('The Email or Password are incorrect')
     }
   }
 
@@ -184,7 +184,7 @@ export class UserService {
       if (friendEmail == '') {
         throw new NotFoundException('The email is empty');
       }
-     // const available = await this.checkIfEmailIsAvailable(friendEmail);
+      // const available = await this.checkIfEmailIsAvailable(friendEmail);
       const friendEmailUser = await this.getUserByEmail(friendEmail);
 
       if (friendEmailUser) {
@@ -200,7 +200,7 @@ export class UserService {
         return {
           'email': friendEmailUser.email,
           'fullName': friendEmailUser.firstName + ' ' + friendEmailUser.lastName,
-          'PhoneNumber': friendEmailUser.phoneNumber
+          'PhoneNumber': friendEmailUser.phoneNumber,
         };
 
       }
@@ -210,21 +210,26 @@ export class UserService {
   }
 
   async deleteWalletFriend(userId: string, friendEmail: string) {
-   try {
-     const user = await this._userModel.findById(userId).exec().then();
-     user.myWalletMembers = user.myWalletMembers.filter(email => email != friendEmail);
-     await user.save();
+    try {
+      const user = await this._userModel.findById(userId).exec().then();
+      user.myWalletMembers = user.myWalletMembers.filter(email => email != friendEmail);
+      await user.save();
 
-     const friendEmailUser = await this.getUserByEmail(friendEmail);
-     return {
-       'email': friendEmailUser.email,
-       'fullName': friendEmailUser.firstName + ' ' + friendEmailUser.lastName,
-       'PhoneNumber': friendEmailUser.phoneNumber
-     };
+      const friendEmailUser = await this.getUserByEmail(friendEmail);
+      return {
+        'email': friendEmailUser.email,
+        'fullName': friendEmailUser.firstName + ' ' + friendEmailUser.lastName,
+        'PhoneNumber': friendEmailUser.phoneNumber,
+      };
 
-   }catch (e){
-     throw new NotFoundException(e);
-   }
+    } catch (e) {
+      throw new NotFoundException(e);
+    }
+  }
+
+  async getPasses(email: string) {
+    const user = await this.getUserByEmail(email);
+    return user.passes;
   }
 }
 

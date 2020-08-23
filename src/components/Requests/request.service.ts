@@ -43,13 +43,13 @@ export class RequestService {
   }
 
   async sendMl(request: Request, user) {
-    const mlServer = 'http://65f576e437e1.ngrok.io/req';
+    const mlServer = 'http://b820cdb00bca.ngrok.io/req';
     const requests = await this.getAllRequestsByUserType(0, request.email);
     const categories = await this._categoriesService.getCategories();
     this.httpService.post(mlServer, {
       'the_request': request,
-      'Request': requests,
-      'User': user,
+      'requests': requests,
+      'user_target': user.target,
       'categories': categories,
     });
   }
@@ -62,7 +62,7 @@ export class RequestService {
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
-      await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
+      await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, ' your friend' + requestDto.email + 'send you a new request');
 
 
       await this.sendMl(newRequest, user);

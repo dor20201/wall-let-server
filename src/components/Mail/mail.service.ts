@@ -41,14 +41,6 @@ export class MailService {
           'content': text,
         });
       }
-
-      // for (const email of emails) {
-      //   Mail = {
-      //     "sendTo": email,
-      //     "subject": subject,
-      //     "content": text,
-      //   };
-      //   await this.sendMail(Mail).then();
       return 'Sending mails succeed';
 
     } catch (e) {

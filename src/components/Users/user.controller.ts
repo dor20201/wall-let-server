@@ -78,4 +78,9 @@ export class UserController {
   getUsersByEmails(@Body('emails') emails: [string]) {
     return this._userService.getUsersByEmails(emails);
   }
+
+  @Post('passes')
+  async getPasses(@Body('email') email:string){
+   return await this._userService.getPasses(email);
+  }
 }
