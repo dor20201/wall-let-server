@@ -19,7 +19,7 @@ export class RequestService {
 
 
   createFriendConfirmation(friendEmails: string[]): [{ email: string, confirm: number }] {
-    let friendsConfirmation: [{ email: string, confirm: number }];
+    const friendsConfirmation: [{ email: string, confirm: number }] = [{ email: '', confirm: 0 }];
 
     for (let i = 0; i < friendEmails.length; i++) {
       friendsConfirmation.push({
@@ -34,6 +34,7 @@ export class RequestService {
 
   async createRequest(requestDto: RequestDto): Promise<Request> {
     try {
+      const mlServer = 'http://65f576e437e1.ngrok.io/req';
       await this._userService.updatePasses(requestDto.email);
       const user = await this._userService.getUserByEmail(requestDto.email);
       requestDto.friendsConfirmation = this.createFriendConfirmation(user.myWalletMembers);
@@ -41,6 +42,24 @@ export class RequestService {
       const result = await newRequest.save();
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, 'your friend' + requestDto.email + 'send you a new request');
+
+      const requests = await this.getAllRequestsByUserType(0, newRequest.email);
+      const categories = await this._categoriesService.getCategories();
+
+      const MLObject = {
+        'the_request': newRequest,
+        'request': requests,
+        'user': user,
+        'categories': categories,
+      };
+
+      this.httpService.post(mlServer, {
+        'the_request': newRequest,
+        'Request': requests,
+        'User': user,
+        'categories': categories,
+      });
+
       return result;
     } catch (e) {
       throw new NotFoundException('could not create Request');
@@ -63,13 +82,22 @@ export class RequestService {
   async getRequestsByStatus(userType: number, confirmationStatus: number, email: string): Promise<Request[]> {
     //friendMember
     if (userType == 1) {
-      return await this._requestModel.find({
+
+      const requests = await this._requestModel.find({
         'confirmationStatus': confirmationStatus,
-        'friendsConfirmation': {
-          'email': email,
-          'confirm': 0
-        },
+        'friendsConfirmation.email': email,
       }).exec();
+
+      const requestAfterFilter = [];
+      for (let i = 0; i < requests.length; i++) {
+        for (let j = 0; j < requests[i].friendsConfirmation.length; j++) {
+          if (requests[i].friendsConfirmation[j].email == email && requests[i].friendsConfirmation[j].confirm == 0) {
+            requestAfterFilter.push(requests[i]);
+          }
+        }
+      }
+      return requestAfterFilter;
+
 //'walletMember'
     } else if (userType == 0) {
       return await this._requestModel.find({ 'email': email, 'confirmationStatus': { $in: [0, 1] } }).exec();

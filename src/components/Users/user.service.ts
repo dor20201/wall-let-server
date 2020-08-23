@@ -11,7 +11,6 @@ export class UserService {
   constructor(@InjectModel('User') private readonly _userModel: Model<User>) {
   }
 
-
   async checkIfEmailIsAvailable(email: string): Promise<boolean> {
     const user = await this._userModel.findOne({ 'email': email }).exec().then();
     return !user;
@@ -25,6 +24,8 @@ export class UserService {
       if (available) {
         const newUser = new this._userModel(userDto);
         return await newUser.save();
+
+
       } else {
         throw new NotFoundException('The Email you insert already exist ');
       }
@@ -50,12 +51,17 @@ export class UserService {
 
   async getUserByPassword(userEmail: string, userPassword: string): Promise<User> {
     const user = await this._userModel.findOne({ 'email': userEmail }).exec();
+    if(user){
     const decryptedPassword = encryption.decrypt(user.password);
+
 
     if (!user || decryptedPassword !== userPassword) {
       throw new NotFoundException('The Email or Password are incorrect');
     }
     return user;
+    }else {
+      throw new NotFoundException('The Email or Password are incorrect')
+    }
   }
 
   async isPasswordAnswerCorrect(email: string, answer: string) {
@@ -114,31 +120,6 @@ export class UserService {
     }
   }
 
-  async addWalletFriend(userId: string, friendEmail: string) {
-    try {
-      if (friendEmail == '') {
-        throw new NotFoundException('The email is empty');
-
-      }
-      const available = await this.checkIfEmailIsAvailable(friendEmail);
-      if (!available) {
-        const user: User = await this._userModel.findById(userId).then();
-        for (let i = 0; i < user.myWalletMembers.length; i++) {
-          if (user.myWalletMembers[i] == friendEmail) {
-            throw new NotFoundException('The friend you are trying to add is already in the WalletMember');
-          }
-        }
-
-        user.myWalletMembers.push(friendEmail);
-        await user.save();
-        return user;
-      }
-    } catch (e) {
-      throw new NotFoundException(e + ' The Friend user were not found');
-
-    }
-  }
-
   async getUsersByEmails(emails: string[]): Promise<any> {
     try {
       return await this._userModel.find({ 'email': { $in: emails } }).exec();
@@ -180,27 +161,77 @@ export class UserService {
   }
 
   async getUserInfo(email: string) {
-    const user = await this._userModel.findOne({ 'email': email });
-    const u = {
+    const user = await this._userModel.findOne({ 'email': email }).exec();
+    const info = {
       'fullName': user.firstName + ' ' + user.lastName,
       'email': user.email,
       'phoneNumber': user.phoneNumber,
     };
 
-    return u;
+    return info;
   }
-
 
   async getUsersInfoByWalletEmail(email: string) {
     const user = await this.getUserByEmail(email);
     const m = user.myWalletMembers;
     const usersInfo = [];
     for (let i = 0; i < m.length; i++) {
-      usersInfo.push(this.getUserInfo(m[i]));
+      usersInfo.push(await this.getUserInfo(m[i]));
     }
     return usersInfo;
   }
 
+  async addWalletFriend(userId: string, friendEmail: string) {
+    try {
+      if (friendEmail == '') {
+        throw new NotFoundException('The email is empty');
+      }
+     // const available = await this.checkIfEmailIsAvailable(friendEmail);
+      const friendEmailUser = await this.getUserByEmail(friendEmail);
+
+      if (friendEmailUser) {
+        const user: User = await this._userModel.findById(userId).exec().then();
+        for (let i = 0; i < user.myWalletMembers.length; i++) {
+          if (user.myWalletMembers[i] == friendEmail) {
+            throw new NotFoundException('The friend you are trying to add is already in the WalletMember');
+          }
+        }
+        user.myWalletMembers.push(friendEmail);
+        await user.save();
+
+        const friendEmailInfo = {
+          'email' : friendEmailUser.email,
+          'fullName': friendEmailUser.firstName + ' ' + friendEmailUser.lastName,
+          'PhoneNumber': friendEmailUser.phoneNumber
+        }
+
+        return friendEmailInfo;
+
+      }
+    } catch (e) {
+      throw new NotFoundException(e + ' The Friend user were not found');
+    }
+  }
+
+  async deleteWalletFriend(userId: string, friendEmail: string) {
+   try {
+     const user = await this._userModel.findById(userId).exec().then();
+     user.myWalletMembers = user.myWalletMembers.filter(email => email != friendEmail);
+     await user.save();
+
+     const friendEmailUser = await this.getUserByEmail(friendEmail);
+     const friendEmailInfo = {
+       'email' : friendEmailUser.email,
+       'fullName': friendEmailUser.firstName + ' ' + friendEmailUser.lastName,
+       'PhoneNumber': friendEmailUser.phoneNumber
+     }
+
+     return friendEmailInfo;
+
+   }catch (e){
+     throw new NotFoundException(e);
+   }
+  }
 }
 
 

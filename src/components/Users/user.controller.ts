@@ -11,24 +11,24 @@ export class UserController {
 
   //checked
   @Get(':id')
-  async getUser(@Param('id') userId: string):Promise<User> {
+  async getUser(@Param('id') userId: string): Promise<User> {
     return await this._userService.getUserById(userId);
   }
 
   @Post('usersInfo')
-  async getUsersInfo(@Body('email') email:string){
+  async getUsersInfo(@Body('email') email: string) {
     return await this._userService.getUsersInfoByWalletEmail(email);
   }
 
   @Post('byEmail')
- async getUserByEmail(@Param('email') email: string):Promise<User> {
+  async getUserByEmail(@Param('email') email: string): Promise<User> {
     return await this._userService.getUserByEmail(email);
   }
 
   //checked
   @Post('logIn')
   async logIn(@Body('email') userEmail: string,
-         @Body('password') userPassword: string):Promise<User> {
+              @Body('password') userPassword: string): Promise<User> {
     return await this._userService.getUserByPassword(userEmail, userPassword);
   }
 
@@ -45,7 +45,7 @@ export class UserController {
   //checked
   @Post('verificationPasswordAnswer')
   async verificationPasswordAnswer(@Body('email') email: string,
-                                     @Body('answer') answer: string): Promise<boolean> {
+                                   @Body('answer') answer: string): Promise<boolean> {
     const isItTrue = await this._userService.isPasswordAnswerCorrect(email, answer);
     return isItTrue;
   }
@@ -56,23 +56,26 @@ export class UserController {
   }
 
   @Post('updatePassword')
-  async updatePassword(@Body('email') email:string,@Body('newPassword')newPassword: string): Promise<string> {
-    return  await this._userService.updatePassword(email,encryption.encrypt(newPassword));
+  async updatePassword(@Body('email') email: string, @Body('newPassword')newPassword: string): Promise<string> {
+    return await this._userService.updatePassword(email, encryption.encrypt(newPassword));
   };
 
   // add friend member to my walletMember list
   @Post('addWalletFriend')
-  async addWalletFriend(@Body('userId') userId:string,
-                        @Body('friendEmail')friendEmail: string): Promise<User> {
-    return  await this._userService.addWalletFriend(userId,friendEmail);
+  async addWalletFriend(@Body('userId') userId: string,
+                        @Body('friendEmail')friendEmail: string) {
+    return await this._userService.addWalletFriend(userId, friendEmail);
   };
 
+  @Post('deleteWalletFriend')
+  async deleteWalletFriend(@Body('userId') userId: string,
+                        @Body('friendEmail')friendEmail: string) {
+    return await this._userService.deleteWalletFriend(userId, friendEmail);
+  };
+
+
   @Post()
-  getUsersByEmails(@Body('emails') emails:[string]){
+  getUsersByEmails(@Body('emails') emails: [string]) {
     return this._userService.getUsersByEmails(emails);
   }
-
-
-
-
 }
