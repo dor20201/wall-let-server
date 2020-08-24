@@ -117,7 +117,7 @@ try {
 
 //'walletMember'
     } else if (userType == 0) {
-      return await this._requestModel.find({ 'email': email, 'confirmationStatus': { $in: [0, 1] } }).exec();
+      return await this._requestModel.find({ 'email': email, 'confirmationStatus': confirmationStatus }).exec();
     }
   }
 
