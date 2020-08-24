@@ -35,14 +35,18 @@ export class MailService {
   async sendMails(emails: string[], subject: string, text: string): Promise<string> {
     try {
       for (const e of emails) {
-        await this.sendMail({
-          'sendTo': e,
-          'subject': subject,
-          'content': text,
-        });
-      }
-      return 'Sending mails succeed';
+        if (e != "") {
+          await this.sendMail({
+            'sendTo': e,
+            'subject': subject,
+            'content': text,
+          });
+        }else {
+          return 'you dont have any friends ';
 
+        }
+        return 'Sending mails succeed';
+      }
     } catch (e) {
       throw new NotFoundException('Could not send mails');
     }

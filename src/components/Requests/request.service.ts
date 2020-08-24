@@ -46,6 +46,8 @@ export class RequestService {
     const mlServer = 'http://b820cdb00bca.ngrok.io/req';
     const requests = await this.getAllRequestsByUserType(0, request.email);
     const categories = await this._categoriesService.getCategories();
+try {
+
 
     const response = await this.httpService.post(mlServer, {
       'the_request': request,
@@ -57,6 +59,9 @@ export class RequestService {
     if (response.data.status) {
       await this.approveByML(request.id);
     }
+}catch (e){
+  throw new NotFoundException(e);
+}
   }
 
   async createRequest(requestDto: RequestDto): Promise<Request> {

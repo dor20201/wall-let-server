@@ -80,8 +80,8 @@ export class UserService {
       user.password = newPassword;
       await user.save();
       return 'Password updated successfully';
-    }else{
-      throw new NotFoundException('the Email you send is empty or not exists')
+    } else {
+      throw new NotFoundException('the Email you send is empty or not exists');
     }
   }
 
@@ -233,7 +233,13 @@ export class UserService {
 
   async getPasses(email: string) {
     const user = await this.getUserByEmail(email);
-    return user.passes;
+    if (user) {
+      return user.passes;
+    }else{
+      throw new NotFoundException('User were not found')
+      return 0;
+    }
+
   }
 }
 
