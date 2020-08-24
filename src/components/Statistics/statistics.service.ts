@@ -12,7 +12,11 @@ export class StatisticsService {
     const user: User = await this._userService.getUserByEmail(email);
     const spent: number = await this._requestService.howMuchISpentThisMonth(email);
 
-    return user.myTarget - spent;
+    if (user) {
+      return user.myTarget - spent;
+    }else{
+      return 0;
+    }
 
   }
 

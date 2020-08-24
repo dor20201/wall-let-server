@@ -1,7 +1,7 @@
 export class RequestDto {
   id: string;
   email: string;
-  openedDate: number;
+  openDate: number;
   closedDate: number;
   category: string;
   cost: number;

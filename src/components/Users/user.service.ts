@@ -76,9 +76,13 @@ export class UserService {
 
   async updatePassword(email: string, newPassword: string) {
     const user: User = await this._userModel.findOne({ email: email }).exec();
-    user.password = newPassword;
-    await user.save();
-    return 'Password updated successfully';
+    if (user) {
+      user.password = newPassword;
+      await user.save();
+      return 'Password updated successfully';
+    }else{
+      throw new NotFoundException('the Email you send is empty or not exists')
+    }
   }
 
   async updateUser(walletMemberDto: WalletMemberDto): Promise<User> {

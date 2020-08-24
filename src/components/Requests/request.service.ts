@@ -46,12 +46,17 @@ export class RequestService {
     const mlServer = 'http://b820cdb00bca.ngrok.io/req';
     const requests = await this.getAllRequestsByUserType(0, request.email);
     const categories = await this._categoriesService.getCategories();
-    this.httpService.post(mlServer, {
+
+    const response = await this.httpService.post(mlServer, {
       'the_request': request,
       'requests': requests,
-      'user_target': user.target,
+      'user_target': user.myTarget,
       'categories': categories,
-    });
+    }).toPromise();
+
+    if (response.data.status) {
+      await this.approveByML(request.id);
+    }
   }
 
   async createRequest(requestDto: RequestDto): Promise<Request> {
@@ -59,11 +64,11 @@ export class RequestService {
       await this._userService.updatePasses(requestDto.email);
       const user = await this._userService.getUserByEmail(requestDto.email);
       requestDto.friendsConfirmation = this.createFriendConfirmation(user.myWalletMembers);
+      requestDto.openDate = Date.now();
       const newRequest = new this._requestModel(requestDto);
       const result = await newRequest.save();
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, ' your friend' + requestDto.email + 'send you a new request');
-
 
       await this.sendMl(newRequest, user);
 
@@ -153,7 +158,7 @@ export class RequestService {
     }
   }
 
-  async approveByPass(userId: string, requestId:string): Promise<string> {
+  async approveByPass(userId: string, requestId: string): Promise<string> {
     const request = await this.getRequestById(requestId);
     const user = await this._userModel.findById(userId);
     if (user.passes > 0) {
@@ -273,6 +278,8 @@ export class RequestService {
       content: 'Your request to load your card in ' + request.cost + ' has been approved :) ',
     };
     await this._mailService.sendMail(mail);
+
+    return 'transaction ended successfully ';
   }
 
   async updateRequest(requestDto: RequestDto): Promise<Request> {
@@ -360,8 +367,9 @@ export class RequestService {
       'confirmationStatus': { $in: [1, 2] },
     }).countDocuments().exec();
 
-    if (allRequest != 0)
+    if (allRequest != 0) {
       return approve / allRequest;
+    } else return 0;
   }
 
   async getExpenseByCategory(email: string) {
