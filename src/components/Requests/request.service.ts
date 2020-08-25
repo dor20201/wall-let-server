@@ -60,7 +60,7 @@ try {
       await this.approveByML(request.id);
     }
 }catch (e){
-  throw new NotFoundException(e);
+  return;
 }
   }
 
@@ -75,7 +75,7 @@ try {
       const emails: string[] = requestDto.friendsConfirmation.map(c => c.email);
       await this._mailService.sendMails(emails, 'new request from ' + requestDto.email, ' your friend' + requestDto.email + 'send you a new request');
 
-      await this.sendMl(newRequest, user);
+      const r = await this.sendMl(newRequest, user);
 
       return result;
     } catch (e) {
@@ -137,7 +137,7 @@ try {
       request.save();
       const user = await this._userService.getUserByEmail(request.email);
 
-      await this.sendMl(request, user);
+    const r =  await this.sendMl(request, user);
 
       return 'Answer received';
     } catch (e) {
