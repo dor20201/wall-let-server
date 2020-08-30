@@ -46,22 +46,22 @@ export class RequestService {
     const mlServer = 'http://b820cdb00bca.ngrok.io/req';
     const requests = await this.getAllRequestsByUserType(0, request.email);
     const categories = await this._categoriesService.getCategories();
-try {
+    try {
 
 
-    const response = await this.httpService.post(mlServer, {
-      'the_request': request,
-      'requests': requests,
-      'user_target': user.myTarget,
-      'categories': categories,
-    }).toPromise();
+      const response = await this.httpService.post(mlServer, {
+        'the_request': request,
+        'requests': requests,
+        'user_target': user.myTarget,
+        'categories': categories,
+      }).toPromise();
 
-    if (response.data.status) {
-      await this.approveByML(request.id);
+      if (response.data.status) {
+        await this.approveByML(request.id);
+      }
+    } catch (e) {
+      return;
     }
-}catch (e){
-  return;
-}
   }
 
   async createRequest(requestDto: RequestDto): Promise<Request> {
@@ -137,7 +137,7 @@ try {
       request.save();
       const user = await this._userService.getUserByEmail(request.email);
 
-    const r =  await this.sendMl(request, user);
+      const r = await this.sendMl(request, user);
 
       return 'Answer received';
     } catch (e) {
@@ -378,14 +378,19 @@ try {
   }
 
   async getExpenseByCategory(email: string) {
-    const t = await this._requestModel.aggregate([
-      { $match: { 'email': email, 'confirmationStatus': 2 } },
-      { $group: { category: '$category', total: { $sum: '$cost' } } },
-    ]).exec(function(e, d) {
-      console.log(d);
-    });
-    return t;
+    const requests = await this.getRequestsByStatus(0, 2, email);
 
+    const dict = new Object();
+
+    for (let i = 0; i < requests.length; i++) {
+      if (dict[requests[i].category]) {
+        dict[requests[i].category] = dict[requests[i].category] + requests[i].cost;
+      } else {
+        dict[requests[i].category] = requests[i].cost;
+      }
+    }
+
+    return dict;
   }
 
   async getApprovedVsDenied(email: string) {
