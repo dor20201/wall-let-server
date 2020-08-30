@@ -37,6 +37,14 @@ export class StatisticsController {
   }
 
 
+  @Post('infoAboutFriend')
+  async getInfoAboutFriend(@Body('myEmail') myEmail: string,@Body('walletMemberEmail') walletMemberEmail: string) {
+    return await this._statisticsService.getInfoAboutFriend(myEmail,walletMemberEmail);
+  }
+
+
+
+
 
 
   //for friend Member

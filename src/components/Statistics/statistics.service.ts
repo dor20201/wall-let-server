@@ -32,4 +32,8 @@ export class StatisticsService {
     return await this._requestService.getApprovedVsDenied(email);
   }
 
+  async getInfoAboutFriend(myEmail:string,walletMemberEmail:string){
+  return await this._requestService.getInfoAboutFriend(myEmail, walletMemberEmail);
+  }
+
 }

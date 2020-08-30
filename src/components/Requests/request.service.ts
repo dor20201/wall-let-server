@@ -252,11 +252,12 @@ export class RequestService {
     const d = new Date();
     const month = d.getMonth();
     const year = d.getFullYear();
-    const requests: Request[] = await this._requestModel.find({
+    let requests: Request[] = await this._requestModel.find({
       'email': email,
       'confirmationStatus': 2,
-      'openedDate': { $lt: new Date(), $gt: new Date(year + ',' + month) },
     }).exec();
+
+    requests = requests.filter(r => r.openDate > new Date(year + ',' + month).getTime());
 
     try {
       if (requests.length != 0) {
@@ -413,6 +414,36 @@ export class RequestService {
   }
 
 
+  async getInfoAboutFriend(myEmail: string, walletMemberEmail: string) {
+    let request = await this.getAllRequestsByUserType(1, myEmail);
+     request = request.filter(r => r.email == walletMemberEmail);
+    let approved = 0;
+    let denied = 0;
+    let didntResponse = 0;
+    for (let i = 0; i < request.length; i++) {
+      for (let j = 0; j < request[i].friendsConfirmation.length; j++) {
+        if (request[i].friendsConfirmation[j].email == myEmail) {
+          switch (request[i].friendsConfirmation[j].confirm) {
+            case 0:
+              didntResponse = didntResponse + 1;
+              break;
+            case 1:
+              approved = approved + 1;
+              break;
+            case 2:
+              denied = denied + 1;
+              break;
+          }
+        }
+      }
+    }
+
+    return {
+      "Approved" : approved,
+      "Denied":denied,
+      "DidntResponse":didntResponse
+    }
+  }
 }
 
 
